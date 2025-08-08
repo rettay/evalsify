@@ -103,10 +103,31 @@ def get_engine() -> Engine:
               judge_scores_json TEXT,
               judge_rationale TEXT,
               total_score REAL,
-              usage_json TEXT
+              usage_json TEXT,
+              human_scores_json TEXT,
+              human_total_score REAL,
+              human_notes TEXT,
+              agreed_bool INTEGER
             );
             """
         )
+            # Best-effort migrations for new Week2 columns (SQLite allows ADD COLUMN)
+        try:
+            conn.exec_driver_sql("ALTER TABLE run_item ADD COLUMN human_scores_json TEXT;")
+        except Exception:
+            pass
+        try:
+            conn.exec_driver_sql("ALTER TABLE run_item ADD COLUMN human_total_score REAL;")
+        except Exception:
+            pass
+        try:
+            conn.exec_driver_sql("ALTER TABLE run_item ADD COLUMN human_notes TEXT;")
+        except Exception:
+            pass
+        try:
+            conn.exec_driver_sql("ALTER TABLE run_item ADD COLUMN agreed_bool INTEGER;")
+        except Exception:
+            pass
     return engine
 
 
@@ -204,6 +225,31 @@ def judge_output(model: str, output: str, expected: str, criteria: List[Dict[str
     except Exception as e:
         return {}, f"[JUDGE ERROR: {e}]", {"input_tokens": 0, "output_tokens": 0, "cost_usd": 0}
 
+
+# -----------------------------
+# Utility helpers (Week2)
+# -----------------------------
+
+def compute_weighted_total(criteria: List[Dict[str, Any]], scores: Dict[str, Any]) -> float:
+    total, wsum = 0.0, 0.0
+    for c in criteria:
+        name = c.get("name"); w = float(c.get("weight", 1) or 1)
+        s = float(scores.get(name, 0) or 0)
+        total += w * s; wsum += w
+    return total / wsum if wsum else 0.0
+
+
+def get_rubric_for_run(engine: Engine, run_id: str) -> List[Dict[str, Any]]:
+    with engine.begin() as conn:
+        row = conn.execute(text("SELECT rubric.json FROM run JOIN rubric ON run.rubric_id=rubric.id WHERE run.id=:i"), {"i": run_id}).fetchone()
+    return json.loads(row[0]) if row else []
+
+
+def agreement_bool(judge_total: float, human_total: float, tolerance: float = 0.5) -> int:
+    try:
+        return 1 if abs(float(judge_total) - float(human_total)) <= tolerance else 0
+    except Exception:
+        return 0
 
 # -----------------------------
 # UI Helpers
@@ -318,10 +364,10 @@ def get_run_items(engine: Engine, run_id: str) -> pd.DataFrame:
 # -----------------------------
 # Streamlit UI
 # -----------------------------
-st.set_page_config(page_title="Evalsify — Week1 MVP", page_icon="✅", layout="wide")
+st.set_page_config(page_title="Evalsify — Week2 MVP", page_icon="✅", layout="wide")
 engine = get_engine()
 
-st.title("Evalsify — Week1 MVP (Batch • Judge • Compare)")
+st.title("Evalsify — Week2 MVP (Batch • Judge • Human Review • Calibrate)")
 
 # Shareable report mode (?report=<run_id>)
 params = st.query_params
@@ -486,10 +532,67 @@ with review_tab:
         pick = st.selectbox("Pick a run", run_name_opts)
         chosen_id = runs_df.iloc[run_name_opts.index(pick)]["id"]
         items = get_run_items(engine, chosen_id)
+
+        # Metrics: reviewed count, agreement, calibrated average
+        reviewed = items[items["human_total_score"].notna()]
+        reviewed_count = len(reviewed)
+        agreement = reviewed["agreed_bool"].mean() if reviewed_count else float("nan")
+        # Calibrated average: human where available, else judge
+        calibrated_series = items.apply(lambda r: r["human_total_score"] if pd.notna(r["human_total_score"]) else r["total_score"], axis=1)
+        calibrated_avg = float(calibrated_series.mean()) if not items.empty else 0.0
+
+        colA, colB, colC = st.columns(3)
+        colA.metric("Reviewed items", f"{reviewed_count}")
+        colB.metric("Agreement (±0.5)", f"{(agreement*100):.0f}%" if reviewed_count else "—")
+        colC.metric("Calibrated Avg", f"{calibrated_avg:.2f}")
+
         st.write("**Run Summary**")
         st.dataframe(runs_df[runs_df["id"]==chosen_id][["id","model","status","avg_score","cost_usd","started_at","finished_at"]], use_container_width=True)
-        st.write("**Items**")
-        st.dataframe(items[["row_index","total_score","input","expected","output","judge_rationale"]], use_container_width=True)
+
+        st.markdown("### Reviewer Queue")
+        # Next item without human score
+        pending = items[items["human_total_score"].isna()].head(1)
+        if pending.empty:
+            st.success("All items reviewed for this run!")
+        else:
+            row = pending.iloc[0]
+            st.write(f"**Item #{int(row['row_index'])}**")
+            st.write("**Input**")
+            st.code(row["input"])
+            if isinstance(row["expected"], str) and row["expected"]:
+                st.write("**Expected**")
+                st.code(row["expected"])
+            st.write("**Model Output**")
+            st.code(row["output"])
+            st.write("**Judge rationale**")
+            st.text(row.get("judge_rationale", ""))
+
+            criteria = get_rubric_for_run(engine, chosen_id)
+            st.write("**Human Scores (1–5)**")
+            human_scores = {}
+            for c in criteria:
+                nm = c.get("name")
+                human_scores[nm] = st.slider(nm, 1, 5, 3)
+            human_notes = st.text_area("Reviewer notes (optional)")
+
+            if st.button("Save Human Review"):
+                h_total = compute_weighted_total(criteria, human_scores)
+                agree = agreement_bool(row["total_score"], h_total, tolerance=0.5)
+                # persist
+                with engine.begin() as conn:
+                    conn.execute(text("""
+                        UPDATE run_item SET human_scores_json=:hs, human_total_score=:ht, human_notes=:hn, agreed_bool=:ab
+                        WHERE id=:id
+                    """), {
+                        "hs": json.dumps(human_scores), "ht": float(h_total), "hn": human_notes, "ab": int(agree), "id": row["id"]
+                    })
+                st.success(f"Saved. Human total: {h_total:.2f} (agree: {'yes' if agree else 'no'})")
+                st.rerun()
+
+        st.markdown("### All Items")
+        display_cols = ["row_index","total_score","human_total_score","agreed_bool","input","expected","output","judge_rationale"]
+        show_cols = [c for c in display_cols if c in items.columns]
+        st.dataframe(items[show_cols], use_container_width=True)
 
 with reports_tab:
     st.subheader("Reports & Charts")
@@ -497,13 +600,36 @@ with reports_tab:
     if runs_df.empty:
         st.info("No runs yet.")
     else:
-        chart = alt.Chart(runs_df).mark_line(point=True).encode(
+        # Judge average over time
+        chart1 = alt.Chart(runs_df).mark_line(point=True).encode(
             x=alt.X("started_at:T", title="Run Time"),
-            y=alt.Y("avg_score:Q", title="Average Score"),
+            y=alt.Y("avg_score:Q", title="Judge Avg Score"),
             color=alt.Color("model:N", title="Model"),
             tooltip=["id","model","avg_score","cost_usd","started_at"]
-        ).properties(height=300)
-        st.altair_chart(chart, use_container_width=True)
+        ).properties(height=280, title="Judge Average over Time")
+        st.altair_chart(chart1, use_container_width=True)
+
+        # Calibrated averages (computed on the fly per run)
+        cal_rows = []
+        for _, r in runs_df.iterrows():
+            items = get_run_items(engine, r["id"])
+            if items.empty:
+                cal = None; agree = None; reviewed = 0
+            else:
+                calibrated = items.apply(lambda x: x["human_total_score"] if pd.notna(x["human_total_score"]) else x["total_score"], axis=1)
+                cal = float(calibrated.mean()) if len(calibrated) else None
+                reviewed = int(items[items["human_total_score"].notna()].shape[0])
+                agree = float(items["agreed_bool"].mean()) if reviewed else None
+            cal_rows.append({"run_id": r["id"], "model": r["model"], "started_at": r["started_at"], "calibrated_avg": cal, "reviewed": reviewed, "agreement": agree})
+        cal_df = pd.DataFrame(cal_rows)
+        if not cal_df.empty:
+            chart2 = alt.Chart(cal_df).mark_line(point=True).encode(
+                x=alt.X("started_at:T", title="Run Time"),
+                y=alt.Y("calibrated_avg:Q", title="Calibrated Avg Score"),
+                color=alt.Color("model:N"),
+                tooltip=["run_id","model","calibrated_avg","reviewed","agreement"]
+            ).properties(height=280, title="Calibrated Average over Time")
+            st.altair_chart(chart2, use_container_width=True)
         st.caption("Tip: Share any single run with '?report=<run_id>' appended to the URL.")
 
 with compare_tab:
