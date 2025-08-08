@@ -208,8 +208,9 @@ def judge_output(model: str, output: str, expected: str, criteria: List[Dict[str
 # UI Helpers
 # -----------------------------
 @st.cache_data(show_spinner=False)
-def list_projects(engine: Engine) -> pd.DataFrame:
-    with engine.begin() as conn:
+def list_projects_df() -> pd.DataFrame:
+    eng = get_engine()
+    with eng.begin() as conn:
         df = pd.read_sql("SELECT * FROM project ORDER BY created_at DESC", conn)
     return df
 
@@ -318,7 +319,7 @@ engine = get_engine()
 st.title("Evalsify — Week1 MVP (Batch • Judge • Compare)")
 
 # Shareable report mode (?report=<run_id>)
-params = st.experimental_get_query_params()
+params = st.query_params
 if "report" in params:
     report_run_id = params["report"][0]
     st.subheader("Shared Report (Read-only)")
@@ -338,7 +339,7 @@ if "report" in params:
 # Sidebar — Project picker / creator
 with st.sidebar:
     st.header("Project")
-    projects = list_projects(engine)
+    projects = list_projects_df()
     if projects.empty:
         pname = st.text_input("Create project name", value="My First Project")
         if st.button("Create Project"):
