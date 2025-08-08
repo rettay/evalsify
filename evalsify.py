@@ -364,15 +364,16 @@ def get_run_items(engine: Engine, run_id: str) -> pd.DataFrame:
 # -----------------------------
 # Streamlit UI
 # -----------------------------
-st.set_page_config(page_title="Evalsify — Week2 MVP", page_icon="✅", layout="wide")
+st.set_page_config(page_title="Evalsify — Week3 MVP", page_icon="✅", layout="wide")
 engine = get_engine()
 
-st.title("Evalsify — Week2 MVP (Batch • Judge • Human Review • Calibrate)")
+st.title("Evalsify — Week3 MVP (Batch • Judge • Human Review • Templates)")
 
 # Shareable report mode (?report=<run_id>)
 params = st.query_params
 if "report" in params:
-    report_run_id = params["report"][0]
+    _report_val = params.get("report")
+    report_run_id = _report_val[0] if isinstance(_report_val, list) else _report_val
     st.subheader("Shared Report (Read-only)")
     with engine.begin() as conn:
         run_row = conn.execute(text("SELECT * FROM run WHERE id=:i"), {"i": report_run_id}).fetchone()
@@ -404,8 +405,9 @@ with st.sidebar:
 
 st.markdown("---")
 
-# Tabs: Run | Review | Reports | Compare
-run_tab, review_tab, reports_tab, compare_tab = st.tabs(["Run Batch", "Review Items", "Reports", "Compare Runs"])
+# Tabs: Run | Review | Reports | Compare | Templates
+tab_names = ["Run Batch", "Review Items", "Reports", "Compare Runs", "Templates"]
+run_tab, review_tab, reports_tab, compare_tab, templates_tab = st.tabs(tab_names)
 
 with run_tab:
     st.subheader("Upload Dataset & Define Rubric")
@@ -520,7 +522,14 @@ with run_tab:
             avg_score = sum(total_scores)/len(total_scores) if total_scores else 0
             complete_run(engine, run_id, avg_score, total_cost)
             st.success(f"Run complete. Avg score: {avg_score:.2f}")
-            st.write(f"**Share report link:** append `?report={run_id}` to your app URL")
+            colx, coly = st.columns([1,2])
+            with colx:
+                if st.button("Open report here"):
+                    # Navigate by updating query params
+                    st.query_params["report"] = run_id
+                    st.rerun()
+            with coly:
+                st.text_input("Share querystring", value=f"?report={run_id}", help="Append this to your app URL", label_visibility="visible")
 
 with review_tab:
     st.subheader("Runs & Items")
@@ -661,3 +670,78 @@ with compare_tab:
         col2.metric("Run B Avg", f"{b_avg:.2f}")
 
         st.caption("Future: align rows by a stable ID to compare per-item across runs.")
+
+with templates_tab:
+    st.subheader("Template Gallery")
+    st.caption("Import a starter pack: creates a dataset + rubric in your current project. Paid templates shown for UX only (no payments wired yet).")
+
+    # Seeded templates (free + paid placeholder)
+    TEMPLATES = [
+        {
+            "id": "summ_faith_v1",
+            "name": "Summarization Faithfulness (News)",
+            "description": "Evaluate if summaries preserve key facts from news articles.",
+            "is_paid": False,
+            "price_usd": 0,
+            "rubric": [
+                {"name": "faithfulness", "desc": "No invented facts; aligns with source.", "weight": 2},
+                {"name": "coverage", "desc": "Captures key points.", "weight": 1},
+                {"name": "clarity", "desc": "Readable and concise.", "weight": 1},
+            ],
+            "dataset_rows": [
+                {"input": "Article: OpenAI announced new features...", "expected": "Summary should mention the features and release timeline."},
+                {"input": "Article: The city council approved a budget...", "expected": "Summary includes vote outcome and key allocations."},
+            ],
+        },
+        {
+            "id": "rag_acc_v1",
+            "name": "RAG Answer Accuracy (Q&A)",
+            "description": "Score groundedness of answers versus provided context.",
+            "is_paid": True,
+            "price_usd": 29,
+            "rubric": [
+                {"name": "groundedness", "desc": "Supported by context.", "weight": 2},
+                {"name": "completeness", "desc": "Answers all parts.", "weight": 1},
+                {"name": "precision", "desc": "No hallucinated details.", "weight": 1},
+            ],
+            "dataset_rows": [
+                {"input": "Context: ...
+Question: What is the warranty period?", "expected": "Answer states exact period from context."},
+                {"input": "Context: ...
+Question: Where is the venue?", "expected": "Answer gives location precisely as in context."},
+            ],
+        },
+    ]
+
+    def import_template(engine: Engine, project_id: str, tpl: dict):
+        # Create rubric
+        rid = save_rubric(engine, project_id, tpl["name"] + " — Rubric", tpl["rubric"], version=1)
+        # Create dataset
+        df = pd.DataFrame(tpl["dataset_rows"]) if tpl.get("dataset_rows") else pd.DataFrame(columns=["input","expected"]) 
+        did = upload_dataset(engine, project_id, tpl["name"] + " — Dataset", df)
+        return rid, did
+
+    # Simple access gate for paid templates (demo only)
+    unlock_secret = st.secrets.get("TEMPLATE_UNLOCK_CODE")
+    entered_code = st.text_input("Enter unlock code to import paid templates (demo)", type="password") if any(t["is_paid"] for t in TEMPLATES) else ""
+
+    for tpl in TEMPLATES:
+        with st.container(border=True):
+            st.markdown(f"### {tpl['name']}")
+            cols = st.columns([3,1])
+            with cols[0]:
+                st.write(tpl["description"])
+                st.write("Rubric:")
+                st.json(tpl["rubric"], expanded=False)
+            with cols[1]:
+                tag = "Paid" if tpl["is_paid"] else "Free"
+                st.metric(tag, f"${tpl['price_usd']}")
+            disabled = False
+            if tpl["is_paid"]:
+                disabled = not (unlock_secret and entered_code and entered_code == unlock_secret)
+                if disabled:
+                    st.caption("This is a paid template. Provide an unlock code to import (demo placeholder for Stripe).")
+            if st.button(f"Import '{tpl['name']}'", disabled=disabled, key=f"imp_{tpl['id']}"):
+                rid, did = import_template(engine, project_id, tpl)
+                st.success(f"Imported rubric {rid} and dataset {did} into project.")
+                st.balloons()
