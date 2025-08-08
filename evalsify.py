@@ -48,7 +48,7 @@ st.set_page_config(page_title="Evalsify — Week4 MVP", page_icon="✅", layout=
 # -----------------------------
 # DB
 # -----------------------------
-SCHEMA_VERSION = 2  # bump when schema changes
+SCHEMA_VERSION = 3
 
 @st.cache_resource(show_spinner=False)
 def get_engine(schema_version: int = SCHEMA_VERSION) -> Engine:
@@ -188,6 +188,20 @@ def create_project(engine: Engine, name: str) -> str:
     return pid
 
 def upload_dataset(engine: Engine, project_id: str, name: str, df: pd.DataFrame) -> str:
+    if not project_id:
+        raise ValueError("No project selected. Please pick or create a project first.")
+
+    # Guard: ensure table exists (defensive for Streamlit cache / first-run race)
+    with engine.begin() as conn:
+        conn.exec_driver_sql("""
+        CREATE TABLE IF NOT EXISTS dataset (
+          id TEXT PRIMARY KEY,
+          project_id TEXT NOT NULL,
+          name TEXT NOT NULL,
+          csv_json TEXT NOT NULL,
+          created_at TEXT NOT NULL
+        )
+        """)    
     did = str(uuid.uuid4())[:8]
     payload = df.to_json(orient="records")
     with engine.begin() as conn:
