@@ -170,7 +170,8 @@ client = get_openai_client()
 # -----------------------------
 @st.cache_data(show_spinner=False)
 def list_projects_df() -> pd.DataFrame:
-    eng = get_engine()
+    eng = get_engine(SCHEMA_VERSION)
+
     with eng.begin() as conn:
         df = pd.read_sql("SELECT * FROM project ORDER BY created_at DESC", conn)
     return df
@@ -321,7 +322,7 @@ with st.sidebar:
             st.rerun()
 
     st.header("Project")
-    engine = get_engine()
+    engine = get_engine(SCHEMA_VERSION)
     projects = list_projects_df()
     if projects.empty:
         pname = st.text_input("Create project name", value="My First Project")
