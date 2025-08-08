@@ -297,27 +297,24 @@ CRITERIA:
 
 Return JSON: {{"scores": {{"<criterion>": 1-5}}, "rationale": "<brief>", "total": "<float 1-5>"}}"""
     try:
-        resp = client.chat.completions.create(
-            model=model,
-            messages=[{"role":"system","content":sys},{"role":"user","content":user}],
-            temperature=0
-        )
-        content = resp.choices[0].message.content
-        # Try to parse JSON in response
-        parsed = None
+        \1
+
+# --- Coerce usage to a plain dict for JSON serialization ---
+usage = {}
+u = getattr(resp, "usage", None)
+if u is not None:
+    try:
+        usage = u.model_dump()
+    except Exception:
         try:
-            start = content.find("{")
-            end = content.rfind("}")
-            parsed = json.loads(content[start:end+1]) if start!=-1 and end!=-1 else None
+            usage = json.loads(getattr(u, "model_dump_json")())
         except Exception:
-            parsed = None
-        if not parsed:
-            scores = {c["name"]: 3 for c in rubric}
-            total = compute_weighted_total(rubric, scores)
-            return {"scores": scores, "rationale": content[:300], "total": total, "usage": getattr(resp, "usage", {}) or {}}
-        scores = parsed.get("scores", {})
-        total = float(parsed.get("total") or compute_weighted_total(rubric, scores))
-        return {"scores": scores, "rationale": parsed.get("rationale",""), "total": total, "usage": getattr(resp, "usage", {}) or {}}
+            try:
+                usage = dict(u)
+            except Exception:
+                usage = {"raw": str(u)}
+# ------------------------------------------------------------
+        return {"scores": scores, "rationale": parsed.get("rationale",""), "total": total, "usage": usage}
     except Exception as e:
         scores = {c["name"]: 3 for c in rubric}
         total = compute_weighted_total(rubric, scores)
@@ -431,7 +428,7 @@ with run_tab:
                               "expected": expected, "output": output,
                               "judge_scores_json": json.dumps(judged["scores"]),
                               "judge_rationale": judged["rationale"],
-                              "total_score": float(judged["total"]), "usage_json": json.dumps(judged.get("usage",{}))})
+                              "total_score": float(judged["total"]), "usage_json": json.dumps(judged.get("usage", {}), default=str)})
                 if idx % 10 == 0:
                     st.write(f"…processed {idx+1}/{len(data_df)}")
             # bulk insert
