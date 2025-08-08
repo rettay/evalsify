@@ -52,21 +52,26 @@ st.set_page_config(page_title="Evalsify — Week4 MVP", page_icon="✅", layout=
 def get_engine() -> Engine:
     db_path = os.getenv("EVALSIFY_DB_PATH", "evalsify.db")
     engine = create_engine(f"sqlite:///{db_path}", future=True)
-    with engine.begin() as conn:
-        conn.exec_driver_sql("""
-        PRAGMA journal_mode=WAL;
+
+    ddl = [
+        "PRAGMA journal_mode=WAL",
+        """
         CREATE TABLE IF NOT EXISTS project (
           id TEXT PRIMARY KEY,
           name TEXT NOT NULL,
           created_at TEXT NOT NULL
-        );
+        )
+        """,
+        """
         CREATE TABLE IF NOT EXISTS dataset (
           id TEXT PRIMARY KEY,
           project_id TEXT NOT NULL,
           name TEXT NOT NULL,
           csv_json TEXT NOT NULL,
           created_at TEXT NOT NULL
-        );
+        )
+        """,
+        """
         CREATE TABLE IF NOT EXISTS rubric (
           id TEXT PRIMARY KEY,
           project_id TEXT NOT NULL,
@@ -74,7 +79,9 @@ def get_engine() -> Engine:
           json TEXT NOT NULL,
           version INTEGER NOT NULL,
           created_at TEXT NOT NULL
-        );
+        )
+        """,
+        """
         CREATE TABLE IF NOT EXISTS run (
           id TEXT PRIMARY KEY,
           project_id TEXT NOT NULL,
@@ -86,7 +93,9 @@ def get_engine() -> Engine:
           cost_usd REAL,
           started_at TEXT NOT NULL,
           finished_at TEXT
-        );
+        )
+        """,
+        """
         CREATE TABLE IF NOT EXISTS run_item (
           id TEXT PRIMARY KEY,
           run_id TEXT NOT NULL,
@@ -102,23 +111,40 @@ def get_engine() -> Engine:
           human_total_score REAL,
           human_notes TEXT,
           agreed_bool INTEGER
-        );
+        )
+        """,
+        """
         CREATE TABLE IF NOT EXISTS entitlement (
           id TEXT PRIMARY KEY,
           email TEXT,
           template_id TEXT NOT NULL,
           created_at TEXT NOT NULL
-        );
+        )
+        """,
+        """
         CREATE TABLE IF NOT EXISTS profile (
           id INTEGER PRIMARY KEY CHECK (id=1),
           display_name TEXT,
           email TEXT
-        );
-        """)
-        # Ensure single row profile
+        )
+        """,
+    ]
+
+    with engine.begin() as conn:
+        for stmt in ddl:
+            try:
+                conn.exec_driver_sql(stmt)
+            except Exception:
+                # WAL pragma can fail on some filesystems; ignore and continue
+                pass
+
+        # ensure a single profile row exists
         row = conn.execute(text("SELECT 1 FROM profile WHERE id=1")).fetchone()
         if not row:
-            conn.execute(text("INSERT INTO profile (id, display_name, email) VALUES (1, 'Anonymous', '')"))
+            conn.execute(
+                text("INSERT INTO profile (id, display_name, email) VALUES (1, 'Anonymous', '')")
+            )
+
     return engine
 
 def now_iso() -> str:
