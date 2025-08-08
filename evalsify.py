@@ -13,7 +13,7 @@ import os
 import uuid
 import json
 import time
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import Dict, Any, List
 
 import pandas as pd
@@ -111,7 +111,8 @@ def get_engine() -> Engine:
 
 
 def now_iso() -> str:
-    return datetime.utcnow().isoformat()
+    # timezone-aware UTC timestamp (avoid deprecation)
+    return datetime.now(UTC).isoformat()
 
 
 # -----------------------------
@@ -220,7 +221,11 @@ def create_project(engine: Engine, name: str) -> str:
     with engine.begin() as conn:
         conn.execute(text("INSERT INTO project (id,name,created_at) VALUES (:i,:n,:t)"),
                      {"i": pid, "n": name, "t": now_iso()})
-    list_projects.clear()
+    # invalidate cached project list
+    try:
+        list_projects_df.clear()
+    except Exception:
+        pass
     return pid
 
 
