@@ -720,7 +720,11 @@ with templates_tab:
     st.markdown("#### Buyer identity (optional)")
     buyer_email = st.text_input("Email for purchases/unlocks (to look up past entitlements)", value=st.session_state.get("buyer_email", ""))
     if buyer_email != st.session_state.get("buyer_email"):
-        st.session_state["buyer_email"] = buyer_email in your current workspace. Paid templates can be purchased via Stripe (if configured) or unlocked with a demo code.")
+        st.session_state["buyer_email"] = buyer_email
+        st.write(
+            "You are now logged in with this email in your current workspace. Paid templates can be purchased via Stripe (if configured) or unlocked with a demo code."
+        )
+
 
     # -----------------------------
     # Templates loading (folder, index, upload, fallback)
