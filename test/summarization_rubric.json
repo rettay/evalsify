@@ -1,0 +1,17 @@
+[
+  {
+    "name": "faithfulness",
+    "desc": "No invented facts; aligns with article content.",
+    "weight": 2
+  },
+  {
+    "name": "coverage",
+    "desc": "Captures the key facts listed in EXPECTED.",
+    "weight": 1
+  },
+  {
+    "name": "clarity",
+    "desc": "Readable, concise sentences.",
+    "weight": 1
+  }
+]

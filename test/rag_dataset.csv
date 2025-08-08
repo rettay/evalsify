@@ -1,0 +1,9 @@
+input,expected
+Context: The standard warranty period for the Model Z is 24 months from purchase. Question: How long is the warranty for Model Z?,24 months
+"Context: The conference will be held at Hall B, Building 3, with registration opening at 8:30 AM. Question: Where will the conference be held?","Hall B, Building 3"
+Context: Our refund policy allows returns within 30 days with receipt; store credit after 30 days. Question: What is the refund window for full returns?,30 days with receipt
+Context: The API v2 introduces rate limits of 1000 requests per minute per API key. Question: What is the rate limit in API v2?,1000 requests per minute per API key
+Context: The team meeting is every Tuesday at 10:00 AM Eastern. Question: When is the weekly team meeting?,Every Tuesday at 10:00 AM Eastern
+"Context: The product supports macOS 13+, Windows 11, and Ubuntu 22.04. Question: Which operating systems are supported?","macOS 13+, Windows 11, Ubuntu 22.04"
+Context: Subscribers on the Pro plan get 10GB storage; Enterprise users get 1TB. Question: How much storage does the Pro plan include?,10GB
+"Context: The library's hours are Mon–Thu 9–6, Fri 9–5, Sat 10–4, closed Sun. Question: Is the library open on Sunday?","No, closed on Sunday"

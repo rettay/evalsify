@@ -48,8 +48,10 @@ st.set_page_config(page_title="Evalsify — Week4 MVP", page_icon="✅", layout=
 # -----------------------------
 # DB
 # -----------------------------
+SCHEMA_VERSION = 2  # bump when schema changes
+
 @st.cache_resource(show_spinner=False)
-def get_engine() -> Engine:
+def get_engine(schema_version: int = SCHEMA_VERSION) -> Engine:
     db_path = os.getenv("EVALSIFY_DB_PATH", "evalsify.db")
     engine = create_engine(f"sqlite:///{db_path}", future=True)
 
@@ -135,17 +137,14 @@ def get_engine() -> Engine:
             try:
                 conn.exec_driver_sql(stmt)
             except Exception:
-                # WAL pragma can fail on some filesystems; ignore and continue
                 pass
-
-        # ensure a single profile row exists
         row = conn.execute(text("SELECT 1 FROM profile WHERE id=1")).fetchone()
         if not row:
-            conn.execute(
-                text("INSERT INTO profile (id, display_name, email) VALUES (1, 'Anonymous', '')")
-            )
-
+            conn.execute(text(
+                "INSERT INTO profile (id, display_name, email) VALUES (1, 'Anonymous', '')"
+            ))
     return engine
+
 
 def now_iso() -> str:
     return datetime.now(UTC).isoformat()

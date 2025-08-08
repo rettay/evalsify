@@ -1,0 +1,17 @@
+[
+  {
+    "name": "groundedness",
+    "desc": "Answer is entailed by the provided context.",
+    "weight": 2
+  },
+  {
+    "name": "completeness",
+    "desc": "Answers all parts of the question.",
+    "weight": 1
+  },
+  {
+    "name": "precision",
+    "desc": "Avoids extra or hallucinated details.",
+    "weight": 1
+  }
+]
