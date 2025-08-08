@@ -48,12 +48,11 @@ st.set_page_config(page_title="Evalsify — Week4 MVP", page_icon="✅", layout=
 # -----------------------------
 # DB
 # -----------------------------
-SCHEMA_VERSION = 3
+SCHEMA_VERSION = 2  # bump when schema changes
 
 @st.cache_resource(show_spinner=False)
 def get_engine(schema_version: int = SCHEMA_VERSION) -> Engine:
-    db_path = os.getenv("EVALSIFY_DB_PATH", "evalsify_dev.db")
-    #os.environ["EVALSIFY_DB_PATH"] = "evalsify_dev.db"
+    db_path = os.getenv("EVALSIFY_DB_PATH", "evalsify.db")
     engine = create_engine(f"sqlite:///{db_path}", future=True)
 
     ddl = [
@@ -171,8 +170,7 @@ client = get_openai_client()
 # -----------------------------
 @st.cache_data(show_spinner=False)
 def list_projects_df() -> pd.DataFrame:
-    eng = get_engine(SCHEMA_VERSION)
-
+    eng = get_engine()
     with eng.begin() as conn:
         df = pd.read_sql("SELECT * FROM project ORDER BY created_at DESC", conn)
     return df
@@ -189,20 +187,6 @@ def create_project(engine: Engine, name: str) -> str:
     return pid
 
 def upload_dataset(engine: Engine, project_id: str, name: str, df: pd.DataFrame) -> str:
-    if not project_id:
-        raise ValueError("No project selected. Please pick or create a project first.")
-
-    # Guard: ensure table exists (defensive for Streamlit cache / first-run race)
-    with engine.begin() as conn:
-        conn.exec_driver_sql("""
-        CREATE TABLE IF NOT EXISTS dataset (
-          id TEXT PRIMARY KEY,
-          project_id TEXT NOT NULL,
-          name TEXT NOT NULL,
-          csv_json TEXT NOT NULL,
-          created_at TEXT NOT NULL
-        )
-        """)    
     did = str(uuid.uuid4())[:8]
     payload = df.to_json(orient="records")
     with engine.begin() as conn:
@@ -297,24 +281,27 @@ CRITERIA:
 
 Return JSON: {{"scores": {{"<criterion>": 1-5}}, "rationale": "<brief>", "total": "<float 1-5>"}}"""
     try:
-        \1
-
-# --- Coerce usage to a plain dict for JSON serialization ---
-usage = {}
-u = getattr(resp, "usage", None)
-if u is not None:
-    try:
-        usage = u.model_dump()
-    except Exception:
+        resp = client.chat.completions.create(
+            model=model,
+            messages=[{"role":"system","content":sys},{"role":"user","content":user}],
+            temperature=0
+        )
+        content = resp.choices[0].message.content
+        # Try to parse JSON in response
+        parsed = None
         try:
-            usage = json.loads(getattr(u, "model_dump_json")())
+            start = content.find("{")
+            end = content.rfind("}")
+            parsed = json.loads(content[start:end+1]) if start!=-1 and end!=-1 else None
         except Exception:
-            try:
-                usage = dict(u)
-            except Exception:
-                usage = {"raw": str(u)}
-# ------------------------------------------------------------
-        return {"scores": scores, "rationale": parsed.get("rationale",""), "total": total, "usage": usage}
+            parsed = None
+        if not parsed:
+            scores = {c["name"]: 3 for c in rubric}
+            total = compute_weighted_total(rubric, scores)
+            return {"scores": scores, "rationale": content[:300], "total": total, "usage": getattr(resp, "usage", {}) or {}}
+        scores = parsed.get("scores", {})
+        total = float(parsed.get("total") or compute_weighted_total(rubric, scores))
+        return {"scores": scores, "rationale": parsed.get("rationale",""), "total": total, "usage": getattr(resp, "usage", {}) or {}}
     except Exception as e:
         scores = {c["name"]: 3 for c in rubric}
         total = compute_weighted_total(rubric, scores)
@@ -334,7 +321,7 @@ with st.sidebar:
             st.rerun()
 
     st.header("Project")
-    engine = get_engine(SCHEMA_VERSION)
+    engine = get_engine()
     projects = list_projects_df()
     if projects.empty:
         pname = st.text_input("Create project name", value="My First Project")
@@ -428,7 +415,7 @@ with run_tab:
                               "expected": expected, "output": output,
                               "judge_scores_json": json.dumps(judged["scores"]),
                               "judge_rationale": judged["rationale"],
-                              "total_score": float(judged["total"]), "usage_json": json.dumps(judged.get("usage", {}), default=str)})
+                              "total_score": float(judged["total"]), "usage_json": json.dumps(judged.get("usage",{}), default=str)})
                 if idx % 10 == 0:
                     st.write(f"…processed {idx+1}/{len(data_df)}")
             # bulk insert
