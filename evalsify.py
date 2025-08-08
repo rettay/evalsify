@@ -52,7 +52,7 @@ SCHEMA_VERSION = 2  # bump when schema changes
 
 @st.cache_resource(show_spinner=False)
 def get_engine(schema_version: int = SCHEMA_VERSION) -> Engine:
-    db_path = os.getenv("EVALSIFY_DB_PATH", "evalsify.db")
+    db_path = os.getenv("EVALSIFY_DB_PATH", "evalsify_dev.db")
     engine = create_engine(f"sqlite:///{db_path}", future=True)
 
     ddl = [
