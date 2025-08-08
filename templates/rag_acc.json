@@ -1,0 +1,19 @@
+[
+  {
+    "id": "rag_acc_v1",
+    "name": "RAG Answer Accuracy (Q&A)",
+    "description": "Score groundedness of answers versus provided context.",
+    "is_paid": true,
+    "price_usd": 29,
+    "stripe_price_id": "price_xxx_from_stripe",
+    "rubric": [
+      {"name":"groundedness","desc":"Supported by the provided context.","weight":2},
+      {"name":"completeness","desc":"Answers all parts of the question.","weight":1},
+      {"name":"precision","desc":"Avoids hallucinated details.","weight":1}
+    ],
+    "dataset_rows": [
+      {"input":"Context: Warranty period is 2 years. Question: What is the warranty period?","expected":"Answer states 2 years."},
+      {"input":"Context: The event venue is Hall B, Building 3. Question: Where is the venue?","expected":"Answer: Hall B, Building 3."}
+    ]
+  }
+]

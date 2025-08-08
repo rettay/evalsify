@@ -1,0 +1,18 @@
+[
+  {
+    "id": "summ_faith_v1",
+    "name": "Summarization Faithfulness (News)",
+    "description": "Evaluate if summaries preserve key facts from news articles.",
+    "is_paid": false,
+    "price_usd": 0,
+    "rubric": [
+      {"name":"faithfulness","desc":"No invented facts; aligns with source.","weight":2},
+      {"name":"coverage","desc":"Captures key points.","weight":1},
+      {"name":"clarity","desc":"Readable and concise.","weight":1}
+    ],
+    "dataset_rows": [
+      {"input":"Article: OpenAI announced new features for its platform.","expected":"Summary mentions the features and release timeline."},
+      {"input":"Article: The city council approved a $5M budget for parks.","expected":"Summary includes vote outcome and main allocations."}
+    ]
+  }
+]

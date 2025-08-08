@@ -1,11 +1,12 @@
 # Requirements (put in requirements.txt):
-# streamlit>=1.35
+# streamlit>=1.35,<2
 # pandas>=2.0
 # sqlalchemy>=2.0
 # aiosqlite
 # openai>=1.30
 # altair>=5.0
 # python-dateutil
+# stripe>=6
 #
 # Optional: If not using OpenAI, you can stub judge() and model_infer() to return dummy data.
 
@@ -14,7 +15,7 @@ import uuid
 import json
 import time
 from datetime import datetime, UTC
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 
 import pandas as pd
 import altair as alt
@@ -26,7 +27,9 @@ from sqlalchemy.engine import Engine
 # -----------------------------
 # Config / Secrets
 # -----------------------------
-OPENAI_API_KEY = st.secrets.get("OPENAI_API_KEY") or os.getenv("OPENAI_API_KEY")
+OPENAI_API_KEY_DEFAULT = st.secrets.get("OPENAI_API_KEY") or os.getenv("OPENAI_API_KEY")
+STRIPE_SECRET_KEY = st.secrets.get("STRIPE_SECRET_KEY") or os.getenv("STRIPE_SECRET_KEY")
+STRIPE_PRICE_LOOKUP = st.secrets.get("STRIPE_PRICE_LOOKUP")  # optional mapping template_id->price_id (JSON string)
 DEFAULT_MODELS = [
     "gpt-4o-mini",
     "gpt-4o",
@@ -128,6 +131,18 @@ def get_engine() -> Engine:
             conn.exec_driver_sql("ALTER TABLE run_item ADD COLUMN agreed_bool INTEGER;")
         except Exception:
             pass
+        # Ensure entitlement table exists (idempotent)
+        try:
+            conn.exec_driver_sql("""
+                CREATE TABLE IF NOT EXISTS entitlement (
+                  id TEXT PRIMARY KEY,
+                  email TEXT,
+                  template_id TEXT NOT NULL,
+                  created_at TEXT NOT NULL
+                );
+            """)
+        except Exception:
+            pass
     return engine
 
 
@@ -139,11 +154,19 @@ def now_iso() -> str:
 # -----------------------------
 # Model & Judge
 # -----------------------------
-if OPENAI_API_KEY:
-    from openai import OpenAI
-    client = OpenAI(api_key=OPENAI_API_KEY)
-else:
-    client = None
+from openai import OpenAI
+
+def get_openai_client() -> Optional[OpenAI]:
+    # Per-user key via sidebar input; fallback to app secret; else None (stub mode)
+    key = st.session_state.get("user_openai_key") or OPENAI_API_KEY_DEFAULT
+    if key:
+        try:
+            return OpenAI(api_key=key)
+        except Exception:
+            return None
+    return None
+
+client = get_openai_client()
 
 
 def model_infer(model: str, prompt: str) -> Dict[str, Any]:
@@ -388,26 +411,44 @@ if "report" in params:
     st.dataframe(items_df[["row_index","total_score","input","expected","output","judge_rationale"]], use_container_width=True)
     st.stop()
 
-# Sidebar — Project picker / creator
+# Sidebar — API key + Project picker / creator
 with st.sidebar:
+    with st.expander("🔑 API Keys", expanded=False):
+        st.caption("Use your own OpenAI key for inference/judging. Not stored server-side — session only.")
+        user_key = st.text_input("OpenAI API Key", type="password", value=st.session_state.get("user_openai_key", ""))
+        if st.button("Use this key"):
+            st.session_state["user_openai_key"] = user_key.strip() or None
+            st.success("Key set for this session.")
+            # Recreate client with new key
+            client = get_openai_client()
+            st.rerun()
     st.header("Project")
     projects = list_projects_df()
     if projects.empty:
         pname = st.text_input("Create project name", value="My First Project")
         if st.button("Create Project"):
             pid = create_project(engine, pname)
+            st.session_state["current_project_id"] = pid
             st.rerun()
         st.stop()
     else:
-        selected_name = st.selectbox("Select project", projects["name"].tolist())
+        id_list = projects["id"].tolist()
+        name_list = projects["name"].tolist()
+        current_id = st.session_state.get("current_project_id", (id_list[0] if id_list else None))
+        try:
+            default_index = id_list.index(current_id) if current_id in id_list else 0
+        except Exception:
+            default_index = 0
+        selected_name = st.selectbox("Select project", name_list, index=default_index)
         project_id = projects.loc[projects["name"] == selected_name, "id"].iloc[0]
+        st.session_state["current_project_id"] = project_id
         st.caption(f"Project ID: {project_id}")
 
 st.markdown("---")
 
 # Tabs: Run | Review | Reports | Compare | Templates
-tab_names = ["Run Batch", "Review Items", "Reports", "Compare Runs", "Templates"]
-run_tab, review_tab, reports_tab, compare_tab, templates_tab = st.tabs(tab_names)
+_tab_names = ["Run Batch", "Review Items", "Reports", "Compare Runs", "Templates"]
+run_tab, review_tab, reports_tab, compare_tab, templates_tab = st.tabs(_tab_names)
 
 with run_tab:
     st.subheader("Upload Dataset & Define Rubric")
@@ -673,10 +714,50 @@ with compare_tab:
 
 with templates_tab:
     st.subheader("Template Gallery")
-    st.caption("Import a starter pack: creates a dataset + rubric in your current project. Paid templates shown for UX only (no payments wired yet).")
+    st.caption("Import a starter pack: creates a dataset + rubric (or whole project) in your current workspace. Paid templates can be purchased via Stripe (if configured) or unlocked with a demo code.")
 
-    # Seeded templates (free + paid placeholder)
-    TEMPLATES = [
+    # Buyer identity (optional for demos, used to persist entitlements)
+    st.markdown("#### Buyer identity (optional)")
+    buyer_email = st.text_input("Email for purchases/unlocks (to look up past entitlements)", value=st.session_state.get("buyer_email", ""))
+    if buyer_email != st.session_state.get("buyer_email"):
+        st.session_state["buyer_email"] = buyer_email in your current workspace. Paid templates can be purchased via Stripe (if configured) or unlocked with a demo code.")
+
+    # -----------------------------
+    # Templates loading (folder, index, upload, fallback)
+    # -----------------------------
+    def load_templates_from_path(path: str):
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            if isinstance(data, dict) and "templates" in data:
+                return data["templates"]
+            return data if isinstance(data, list) else []
+        except Exception:
+            return []
+
+    def load_templates_folder(folder: str):
+        items = []
+        index_path = os.path.join(folder, "index.json")
+        if os.path.exists(index_path):
+            # If index exists, it can reference files or embed templates
+            idx = load_templates_from_path(index_path)
+            if isinstance(idx, list):
+                for ent in idx:
+                    if isinstance(ent, str) and ent.endswith('.json'):
+                        items.extend(load_templates_from_path(os.path.join(folder, ent)) or [])
+                    elif isinstance(ent, dict):
+                        items.append(ent)
+        # Also load any loose *.json files in folder
+        try:
+            for fn in sorted(os.listdir(folder)):
+                if fn.endswith('.json') and fn != 'index.json':
+                    items.extend(load_templates_from_path(os.path.join(folder, fn)) or [])
+        except Exception:
+            pass
+        return items
+
+    # Built-in fallback
+    SAMPLE_TEMPLATES = [
         {
             "id": "summ_faith_v1",
             "name": "Summarization Faithfulness (News)",
@@ -686,12 +767,12 @@ with templates_tab:
             "rubric": [
                 {"name": "faithfulness", "desc": "No invented facts; aligns with source.", "weight": 2},
                 {"name": "coverage", "desc": "Captures key points.", "weight": 1},
-                {"name": "clarity", "desc": "Readable and concise.", "weight": 1},
+                {"name": "clarity", "desc": "Readable and concise.", "weight": 1}
             ],
             "dataset_rows": [
-                {"input": "Article: OpenAI announced new features...", "expected": "Summary should mention the features and release timeline."},
-                {"input": "Article: The city council approved a budget...", "expected": "Summary includes vote outcome and key allocations."},
-            ],
+                {"input": "Article: OpenAI announced new features for its platform.", "expected": "Summary mentions the features and release timeline."},
+                {"input": "Article: The city council approved a $5M budget for parks.", "expected": "Summary includes vote outcome and main allocations."}
+            ]
         },
         {
             "id": "rag_acc_v1",
@@ -700,48 +781,176 @@ with templates_tab:
             "is_paid": True,
             "price_usd": 29,
             "rubric": [
-                {"name": "groundedness", "desc": "Supported by context.", "weight": 2},
-                {"name": "completeness", "desc": "Answers all parts.", "weight": 1},
-                {"name": "precision", "desc": "No hallucinated details.", "weight": 1},
+                {"name": "groundedness", "desc": "Supported by the provided context.", "weight": 2},
+                {"name": "completeness", "desc": "Answers all parts of the question.", "weight": 1},
+                {"name": "precision", "desc": "Avoids hallucinated details.", "weight": 1}
             ],
             "dataset_rows": [
-                {"input": "Context: ...
-Question: What is the warranty period?", "expected": "Answer states exact period from context."},
-                {"input": "Context: ...
-Question: Where is the venue?", "expected": "Answer gives location precisely as in context."},
+                {"input": "Context: Warranty period is 2 years. Question: What is the warranty period?", "expected": "Answer states 2 years."},
+                {"input": "Context: The event venue is Hall B, Building 3. Question: Where is the venue?", "expected": "Answer: Hall B, Building 3."}
             ],
-        },
+            "stripe_price_id": "price_XXXX_optional"
+        }
     ]
+
+    # Load order: uploaded -> templates/ folder -> repo templates.json -> fallback
+    repo_templates_root = load_templates_from_path(os.path.join(os.getcwd(), "templates.json"))
+    folder_templates = load_templates_folder(os.path.join(os.getcwd(), "templates"))
+    up_json = st.file_uploader("Upload templates.json (list or {\"templates\": [...]})", type=["json"], key="tpl_uploader")
+    uploaded_templates = []
+    if up_json is not None:
+        try:
+            uploaded_templates = json.load(up_json)
+            if isinstance(uploaded_templates, dict) and "templates" in uploaded_templates:
+                uploaded_templates = uploaded_templates["templates"]
+            if not isinstance(uploaded_templates, list):
+                uploaded_templates = []
+        except Exception as e:
+            st.error(f"Invalid JSON: {e}")
+            uploaded_templates = []
+
+    TEMPLATES = uploaded_templates or folder_templates or repo_templates_root or SAMPLE_TEMPLATES
+    st.caption(f"Loaded {len(TEMPLATES)} template(s) — source: " + ("uploaded" if uploaded_templates else ("templates/" if folder_templates else ("repo templates.json" if repo_templates_root else "built-in samples"))))
+
+    # -----------------------------
+    # Stripe purchase flow (optional)
+    # -----------------------------
+    try:
+        import stripe  # type: ignore
+        stripe.api_key = STRIPE_SECRET_KEY if STRIPE_SECRET_KEY else None
+    except Exception:
+        stripe = None
+
+    def start_checkout(price_id: str, template_id: str):
+        if not (stripe and STRIPE_SECRET_KEY):
+            st.error("Stripe not configured. Set STRIPE_SECRET_KEY in Secrets.")
+            return None
+        # Build a success URL pointing back to this app
+        try:
+            current_url = st.experimental_get_url()  # Streamlit 1.35
+        except Exception:
+            current_url = ""
+        success_url = (current_url or "").split('#')[0]
+        if "?" in success_url:
+            success_url += f"&entitle={template_id}"
+        else:
+            success_url += f"?entitle={template_id}"
+        cancel_url = success_url
+        try:
+            sess = stripe.checkout.Session.create(
+                mode="payment",
+                line_items=[{"price": price_id, "quantity": 1}],
+                success_url=success_url + "&session_id={CHECKOUT_SESSION_ID}",
+                cancel_url=cancel_url,
+            )
+            return sess.url
+        except Exception as e:
+            st.error(f"Stripe error: {e}")
+            return None
+
+    # Entitlements stored in session for MVP (plus persisted in SQLite when email present)
+    if "entitlements" not in st.session_state:
+        st.session_state["entitlements"] = set()
+
+    # Helpers for entitlement persistence
+    def save_entitlement(engine: Engine, template_id: str, email: Optional[str]):
+        with engine.begin() as conn:
+            conn.execute(text("""
+                INSERT INTO entitlement (id, email, template_id, created_at)
+                VALUES (:i,:e,:t,:c)
+            """), {"i": str(uuid.uuid4())[:8], "e": (email or None), "t": template_id, "c": now_iso()})
+
+    def has_entitlement_db(engine: Engine, template_id: str, email: Optional[str]) -> bool:
+        if not email:
+            return False
+        with engine.begin() as conn:
+            row = conn.execute(text("SELECT 1 FROM entitlement WHERE template_id=:t AND email=:e LIMIT 1"), {"t": template_id, "e": email}).fetchone()
+        return bool(row)
+
+    # If redirected back with entitlement
+    q = st.query_params
+    entitle = q.get("entitle")
+    sess_id = q.get("session_id")
+    if entitle and sess_id and stripe and STRIPE_SECRET_KEY:
+        try:
+            sess = stripe.checkout.Session.retrieve(sess_id)
+            if sess and sess.get("payment_status") == "paid":
+                st.session_state["entitlements"].add(entitle)
+                # derive email from Stripe session if available
+                email_from_stripe = None
+                try:
+                    email_from_stripe = (sess.get("customer_details") or {}).get("email")
+                except Exception:
+                    email_from_stripe = None
+                email_final = email_from_stripe or st.session_state.get("buyer_email")
+                if email_final:
+                    save_entitlement(engine, entitle, email_final)
+                st.success(f"Purchase confirmed. Unlocked template '{entitle}'.")
+        except Exception as e:
+            st.warning(f"Could not verify Stripe session: {e}")
+
+    def has_entitlement(tpl: dict) -> bool:
+        if not tpl.get("is_paid"):
+            return True
+        # Session unlock or DB entitlement by email, or unlock code if Stripe missing
+        session_ok = tpl.get("id") in st.session_state.get("entitlements", set())
+        email_ok = has_entitlement_db(engine, tpl.get("id"), st.session_state.get("buyer_email"))
+        if session_ok or email_ok:
+            return True
+        code_ok = False
+        if STRIPE_SECRET_KEY is None:
+            code_key = f"code_{tpl.get('id','x')}"
+            code_val = st.text_input("Enter unlock code (demo)", type="password", key=code_key)
+            code_ok = st.secrets.get("TEMPLATE_UNLOCK_CODE") and code_val == st.secrets.get("TEMPLATE_UNLOCK_CODE")
+        return bool(code_ok)
 
     def import_template(engine: Engine, project_id: str, tpl: dict):
         # Create rubric
-        rid = save_rubric(engine, project_id, tpl["name"] + " — Rubric", tpl["rubric"], version=1)
+        rid = save_rubric(engine, project_id, tpl.get("name", "Template") + " — Rubric", tpl.get("rubric", []), version=1)
         # Create dataset
-        df = pd.DataFrame(tpl["dataset_rows"]) if tpl.get("dataset_rows") else pd.DataFrame(columns=["input","expected"]) 
-        did = upload_dataset(engine, project_id, tpl["name"] + " — Dataset", df)
+        rows = tpl.get("dataset_rows") or tpl.get("dataset") or []
+        df = pd.DataFrame(rows) if rows else pd.DataFrame(columns=["input","expected"]) 
+        did = upload_dataset(engine, project_id, tpl.get("name", "Template") + " — Dataset", df)
         return rid, did
 
-    # Simple access gate for paid templates (demo only)
-    unlock_secret = st.secrets.get("TEMPLATE_UNLOCK_CODE")
-    entered_code = st.text_input("Enter unlock code to import paid templates (demo)", type="password") if any(t["is_paid"] for t in TEMPLATES) else ""
+    def create_project_from_template(engine: Engine, tpl: dict) -> str:
+        pid = create_project(engine, tpl.get("name", "New Project"))
+        rid, did = import_template(engine, pid, tpl)
+        return pid
 
+    # Render cards
     for tpl in TEMPLATES:
         with st.container(border=True):
-            st.markdown(f"### {tpl['name']}")
+            st.markdown(f"### {tpl.get('name','Untitled Template')}")
             cols = st.columns([3,1])
             with cols[0]:
-                st.write(tpl["description"])
+                st.write(tpl.get("description", ""))
                 st.write("Rubric:")
-                st.json(tpl["rubric"], expanded=False)
+                st.json(tpl.get("rubric", []), expanded=False)
             with cols[1]:
-                tag = "Paid" if tpl["is_paid"] else "Free"
-                st.metric(tag, f"${tpl['price_usd']}")
-            disabled = False
-            if tpl["is_paid"]:
-                disabled = not (unlock_secret and entered_code and entered_code == unlock_secret)
-                if disabled:
-                    st.caption("This is a paid template. Provide an unlock code to import (demo placeholder for Stripe).")
-            if st.button(f"Import '{tpl['name']}'", disabled=disabled, key=f"imp_{tpl['id']}"):
+                price = tpl.get("price_usd", 0)
+                tag = "Paid" if tpl.get("is_paid") else "Free"
+                st.metric(tag, f"${price}")
+
+            # Actions
+            colA, colB, colC = st.columns([1,1,2])
+            entitled = has_entitlement(tpl)
+            proj_btn = colA.button(f"Create project from template", key=f"proj_{tpl.get('id', str(uuid.uuid4())[:8])}", disabled=tpl.get("is_paid") and not entitled)
+            imp_btn = colB.button(f"Import into current project", key=f"imp_{tpl.get('id', str(uuid.uuid4())[:8])}", disabled=tpl.get("is_paid") and not entitled)
+            if proj_btn:
+                new_pid = create_project_from_template(engine, tpl)
+                st.success(f"Project created: {new_pid}. Open it from the sidebar.")
+            if imp_btn:
                 rid, did = import_template(engine, project_id, tpl)
-                st.success(f"Imported rubric {rid} and dataset {did} into project.")
-                st.balloons()
+                st.success(f"Imported rubric {rid} and dataset {did} into project {project_id}.")
+
+            # Purchase if needed
+            if tpl.get("is_paid") and not entitled:
+                price_id = tpl.get("stripe_price_id")
+                if price_id and stripe and STRIPE_SECRET_KEY:
+                    if colC.button("Purchase via Stripe", key=f"buy_{tpl.get('id','x')}"):
+                        url = start_checkout(price_id, tpl.get("id","tpl"))
+                        if url:
+                            st.markdown(f"[Open Checkout]({url})")
+                else:
+                    st.caption("Unlock code demo is active (no Stripe price configured). Set TEMPLATE_UNLOCK_CODE in Secrets.")
