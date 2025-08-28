@@ -1,4 +1,4 @@
-**P\<designation\>™/D1**
+# P<designation>™/D1
 
 # Draft Standard for Evaluating LLM-Powered Applications, Systems, and Products
 
@@ -7,7 +7,7 @@ Developed by the
 of the  
 **IEEE Computer Society** 
 
-Approved \<Date TBD\>
+Approved <Date TBD>
 
 **IEEE SA Standards Board**
 
@@ -17,130 +17,10 @@ New York, New York 10016-5997, USA
 
 All rights reserved.
 
-This document is an unapproved draft of a proposed IEEE Standard. As such, this document is subject to change. USE AT YOUR OWN RISK\! IEEE copyright statements SHALL NOT BE REMOVED from draft or approved IEEE standards, or modified in any way. Because this is an unapproved draft, this document must not be utilized for any conformance/compliance purposes. Permission is hereby granted for officers from each IEEE Standards Working Group or Committee to reproduce the draft document developed by that Working Group for purposes of international standardization consideration. IEEE Standards Department must be informed of the submission for consideration prior to any reproduction for international standardization consideration (stds-ipr@ieee.org). Prior to adoption of this document, in whole or in part, by another standards development organization, permission must first be obtained from the IEEE Standards Department (stds-ipr@ieee.org). When requesting permission, IEEE Standards Department will require a copy of the standard development organization’s document highlighting the use of IEEE content. Other entities seeking permission to reproduce this document, in whole or in part, must also obtain permission from the IEEE Standards Department.
+**Abstract:** This standard specifies a comprehensive, interoperable framework for evaluating LLM-powered applications and systems, incorporating safety, security, and bias considerations. Grounded in the atomic unit of evaluation—a single model-task assessment consisting of an input, expected output ("Golden"), rubric, and score—the standard defines JSON-based schemas, statistical validation requirements, conformance testing procedures, and quality assurance protocols to enable consistent, reproducible, and statistically valid assessments across tools and organizations.
 
-IEEE Standards Department  
-445 Hoes Lane  
-Piscataway, NJ 08854, USA
+**Keywords:** AI evaluation, golden datasets, evaluation rubrics, statistical validation, conformance testing, safety evaluation, bias detection, interoperability, JSON schema, model benchmarking
 
-**Abstract:** This standard specifies a structured, interoperable framework for evaluating LLM-powered applications and systems, grounded in the definition of a single model-task evaluation — the atomic unit consisting of an input, an expected output (“Golden”), a rubric, and a resulting score. JSON-based schemas define datasets, rubrics, and specifications as structured compositions of these atomic units, enabling consistent, reproducible, and comparable assessments across tools and organizations.
-
-**Keywords:** AI evaluation, golden datasets, evaluation rubrics, evaluation specifications, JSON schema, model benchmarking, interoperability  
----
-
-**Important Notices and Disclaimers Concerning IEEE Standards Documents**
-
-IEEE Standards documents are made available for use subject to important notices and legal disclaimers. These notices and disclaimers, or a reference to this page [(https://standards.ieee.org/ipr/disclaimers.html)](https://standards.ieee.org/ipr/disclaimers.html), appear in all IEEE standards and may be found under the heading “Important Notices and Disclaimers Concerning IEEE Standards Documents.”
-
-**Notice and Disclaimer of Liability Concerning the Use of IEEE Standards Documents**
-
-IEEE Standards documents are developed within IEEE Societies and subcommittees of IEEE Standards Association (IEEE SA) Board of Governors. IEEE develops its standards through an accredited consensus development process, which brings together volunteers representing varied viewpoints and interests to achieve the final product. IEEE standards are documents developed by volunteers with scientific, academic, and industry-based expertise in technical working groups. Volunteers involved in technical working groups are not necessarily members of IEEE or IEEE SA and participate without compensation from IEEE. While IEEE administers the process and establishes rules to promote fairness in the consensus development process, IEEE does not independently evaluate, test, or verify the accuracy of any of the information or the soundness of any judgments contained in its standards.
-
-IEEE makes no warranties or representations concerning its standards, and expressly disclaims all warranties, express or implied, concerning all standards, including but not limited to the warranties of merchantability, fitness for a particular purpose, and non-infringement. IEEE Standards documents do not guarantee safety, security, health, or environmental protection, or compliance with law, or guarantee against interference with or from other devices or networks. In addition, IEEE does not warrant or represent that the use of the material contained in its standards is free from patent infringement. IEEE Standards documents are supplied “AS IS” and “WITH ALL FAULTS.”  
-Use of an IEEE standard is wholly voluntary. The existence of an IEEE standard does not imply that there are no other ways to produce, test, measure, purchase, market, or provide other goods and services related to the scope of the IEEE standard. Furthermore, the viewpoint expressed at the time a standard is approved and issued is subject to change brought about through developments in the state of the art and comments received from users of the standard.  
-In publishing and making its standards available, IEEE is not suggesting or rendering professional or other services for, or on behalf of, any person or entity, nor is IEEE undertaking to perform any duty owed by any other person or entity to another. Any person utilizing any IEEE Standards document should rely upon their own independent judgment in the exercise of reasonable care in any given circumstances or, as appropriate, seek the advice of a competent professional in determining the appropriateness of a given IEEE standard.
-
-IN NO EVENT SHALL IEEE BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO: THE NEED TO PROCURE SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE PUBLICATION, USE OF, OR RELIANCE UPON ANY STANDARD, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE AND REGARDLESS OF WHETHER SUCH DAMAGE WAS FORESEEABLE.
-
-**Translations**
-
-The IEEE consensus balloting process involves the review of documents in English only. In the event that an IEEE standard is translated, only the English language version published by IEEE is the approved IEEE standard.
-
-**Use by Artificial Intelligence Systems**
-
-In no event shall material in any IEEE Standards documents be used for the purpose of creating, training, enhancing, developing, maintaining, or contributing to any artificial intelligence systems without the express, written consent of IEEE SA in advance. “Artificial intelligence” refers to any software, application, or other system that uses artificial intelligence, machine learning, or similar technologies, to analyze, train, process, or generate content. Requests for consent can be submitted using the Contact Us form.
-
-**Official Statements**
-
-A statement, written or oral, that is not processed in accordance with the IEEE SA Standards Board Operations Manual is not, and shall not be considered or inferred to be, the official position of IEEE or any of its committees and shall not be considered to be, or be relied upon as, a formal position of IEEE or IEEE SA. At lectures, symposia, seminars, or educational courses, an individual presenting information on IEEE standards shall make it clear that the presenter’s views should be considered the personal views of that individual rather than the formal position of IEEE, IEEE SA, the Standards Committee, or the Working Group. Statements made by volunteers may not represent the formal position of their employer(s) or affiliation(s). News releases about IEEE standards issued by entities other than IEEE SA should be considered the view of the entity issuing the release rather than the formal position of IEEE or IEEE SA.
-
-**Comments on Standards**
-
-Comments for revision of IEEE Standards documents are welcome from any interested party, regardless of membership affiliation with IEEE or IEEE SA. Suggestions for changes in documents should be in the form of a proposed change of text, together with appropriate supporting comments. Comments on standards should be submitted using the Contact Us form [(https://standards.ieee.org/contact/)](https://standards.ieee.org/contact/).
-
-**Laws and Regulations**
-
-Users of IEEE Standards documents should consult all applicable laws and regulations. Compliance with the provisions of any IEEE Standards document does not constitute compliance to any applicable regulatory requirements. Implementers of the standard are responsible for observing or referring to the applicable regulatory requirements. IEEE does not, by the publication of its standards, intend to urge action that is not in compliance with applicable laws, and these documents may not be construed as doing so.
-
-**Data Privacy**
-
-Users of IEEE Standards documents should evaluate the standards for considerations of data privacy and data ownership in the context of assessing and using the standards in compliance with applicable laws and regulations.
-
-**Copyrights**
-
-IEEE draft and approved standards are copyrighted by IEEE under U.S. and international copyright laws. They are made available by IEEE and are adopted for a wide variety of both public and private uses. These include both use by reference, in laws and regulations, and use in private self-regulation, standardization, and the promotion of engineering practices and methods. By making these documents available for use and adoption by public authorities and private users, neither IEEE nor its licensors waive any rights in copyright to the documents.  
-**Photocopies**
-
-Subject to payment of the appropriate licensing fees, IEEE will grant users a limited, non-exclusive license to photocopy portions of any individual standard for company or organizational internal use or individual, non-commercial use only. To arrange for payment of licensing fees, please contact Copyright Clearance Center, Customer Service, 222 Rosewood Drive, Danvers, MA 01923 USA; \+1 978 750 8400; [https://www.copyright.com/](https://www.copyright.com/). Permission to photocopy portions of any individual standard for educational classroom use can also be obtained through the Copyright Clearance Center.
-
-**Updating of IEEE Standards Documents**
-
-Users of IEEE Standards documents should be aware that these documents may be superseded at any time by the issuance of new editions or may be amended from time to time through the issuance of amendments, corrigenda, or errata. An official IEEE document at any point in time consists of the current edition of the document together with any amendments, corrigenda, or errata then in effect. Every IEEE standard is subjected to review at least every 10 years. When a document is more than 10 years old and has not undergone a revision process, it is reasonable to conclude that its contents, although still of some value, do not wholly reflect the present state of the art. Users are cautioned to check to determine that they have the latest edition of any IEEE standard. In order to determine whether a given document is the current edition and whether it has been amended through the issuance of amendments, corrigenda, or errata, visit IEEE Xplore or contact IEEE [(https://standards.ieee.org/)](https://standards.ieee.org/).
-
-**Errata**
-
-Errata, if any, for all IEEE standards can be accessed on the IEEE SA Website [(https://standards.ieee.org/)](https://standards.ieee.org/). Search for standard number and year of approval to access the web page of the published standard. Errata links are located under the Additional Resources Details section. Errata are also available in IEEE Xplore. Users are encouraged to periodically check for errata.
-
-**Patents**
-
-IEEE standards are developed in compliance with the IEEE SA Patent Policy [(https://standards.ieee.org/about/sasb/patcom/patents.html)](https://standards.ieee.org/about/sasb/patcom/patents.html). Attention is called to the possibility that implementation of this standard may require use of subject matter covered by patent rights. By publication of this standard, no position is taken by the IEEE with respect to the existence or validity of any patent rights in connection therewith. If a patent holder or patent applicant has filed a statement of assurance via an Accepted Letter of Assurance, then the statement is listed on the IEEE SA Website. Letters of Assurance may indicate whether the Submitter is willing or unwilling to grant licenses under patent rights without compensation or under reasonable rates, with reasonable terms and conditions that are demonstrably free of any unfair discrimination to applicants desiring to obtain such licenses. Essential Patent Claims may exist for which a Letter of Assurance has not been received. The IEEE is not responsible for identifying Essential Patent Claims for which a license may be required, for conducting inquiries into the legal validity or scope of Patents Claims, or determining whether any licensing terms or conditions provided in connection with submission of a Letter of Assurance, if any, or in any licensing agreements are reasonable or non-discriminatory. Users of this standard are expressly advised that determination of the validity of any patent rights, and the risk of infringement of such rights, is entirely their own responsibility. Further information may be obtained from the IEEE Standards Association.
-
-**IMPORTANT NOTICE**
-
-Technologies, application of technologies, and recommended procedures in various industries evolve over time. The IEEE standards development process allows participants to review developments in industries, technologies, and practices, and to determine what, if any, updates should be made to the IEEE standard. During this evolution, the technologies and recommendations in IEEE standards may be implemented in ways not foreseen during the standard’s development. IEEE standards development activities consider research and information presented to the standards development group in developing any safety recommendations. Other information about safety practices, changes in technology or technology implementation, or impact by peripheral systems also may be pertinent to safety considerations during implementation of the standard. Implementers and users of IEEE Standards documents are responsible for determining and complying with all appropriate safety, security, environmental, health, data privacy, and interference protection practices and all applicable laws and regulations.
-
-**Participants**
-
-At the time this draft Standard was completed, the AI Model Evaluation Working Group had the following membership:
-
-\<Name TBD\>, Chair  
-\<Name TBD\>, Vice Chair  
-Participant1  
-Participant2  
-Participant3  
-Participant4  
-Participant5  
-Participant6  
-Participant7  
-Participant8  
-Participant9
-
-The following members of the individual/entity Standards Association balloting group voted on this Standard. Balloters may have voted for approval, disapproval, or abstention.
-
-\[To be supplied by IEEE\]  
-Balloter1  
-Balloter2  
-Balloter3  
-Balloter4  
-Balloter5  
-Balloter6  
-Balloter7  
-Balloter8  
-Balloter9
-
-When the IEEE SA Standards Board approved this Standard on \<Date TBD\>, it had the following membership:
-
-\[To be supplied by IEEE\]  
-\<Name\>, Chair  
-\<Name\>, Vice Chair  
-\<Name\>, Past Chair  
-\<Name\>, Secretary  
-SBMember1  
-SBMember2  
-SBMember3  
-SBMember4  
-SBMember5  
-SBMember6  
-SBMember7  
-SBMember8  
-SBMember9  
-\*Member Emeritus  
----
-
-**Introduction**
-
-This introduction is not part of P\<number\>/D1, Draft Standard for Evaluating LLM-Powered Applications, Systems, and Products.  
-This standard addresses the need for consistent, interoperable, and reproducible evaluation of LLM-powered applications and systems. At its foundation, the standard defines the atomic unit of evaluation: a single model-task evaluation consisting of an input, an expected output (“Golden”), a rubric, and a resulting score. Higher-level constructs — evaluation datasets, rubrics, and specifications — are structured compositions of these atomic units. By grounding the framework in this universal format, the standard ensures clarity, extensibility, and comparability across both technical benchmarking and application-level evaluations.  
 ---
 
 **Contents**
@@ -158,298 +38,1384 @@ This standard addresses the need for consistent, interoperable, and reproducible
    4.2 Evaluation Datasets  
    4.3 Evaluation Rubrics  
    4.4 Evaluation Specifications  
-5. JSON Schema Specifications  
+   4.5 Evaluation Aggregation  
+5. Quality Assurance Requirements  
    5.1 General  
-   5.2 Dataset Schema  
-   5.3 Rubric Schema  
-   5.4 Evaluation Specification Schema  
-6. Use Cases and Integration  
+   5.2 Dataset Quality Requirements  
+   5.3 Statistical Validation Requirements  
+   5.4 Version Control and Provenance  
+6. Safety, Security, and Bias Considerations  
    6.1 General  
-   6.2 Reusable Benchmarks  
-   6.3 AI Product Validation  
-   6.4 Cross-Team Sharing  
-   6.5 Tool Integration  
-   Annex A (informative) Bibliography
+   6.2 Safety Evaluation Requirements  
+   6.3 Security Assessment Protocols  
+   6.4 Bias Detection and Mitigation  
+   6.5 Adversarial Testing Requirements  
+7. JSON Schema Specifications  
+   7.1 General  
+   7.2 Dataset Schema  
+   7.3 Rubric Schema  
+   7.4 Evaluation Specification Schema  
+   7.5 Schema Versioning and Migration  
+8. Conformance and Testing  
+   8.1 General  
+   8.2 Conformance Requirements  
+   8.3 Interoperability Testing  
+   8.4 Certification Procedures  
+9. Use Cases and Integration  
+   9.1 General  
+   9.2 Multi-Modal Evaluations  
+   9.3 Agentic AI Systems  
+   9.4 Real-Time and Streaming Evaluation  
+   9.5 Federated Evaluation Approaches  
+
+Annex A (informative) Bibliography  
+Annex B (informative) Example Implementation  
+Annex C (normative) Conformance Test Procedures  
+Annex D (informative) Statistical Methods for Evaluation  
+Annex E (informative) Security Considerations Checklist  
+Annex F (informative) Multi-Modal and Agentic Extensions
 
 ---
 
-**Draft Standard for Evaluating LLM-Powered Applications, Systems, and Products**
+## 1. Overview
 
-**1\. Overview**
+### 1.1 Scope
 
-**1.1 Scope**
+This standard specifies a comprehensive framework for evaluating LLM-powered applications and systems, anchored in single model-task evaluations as the atomic unit. Each evaluation unit consists of an input, expected output ("Golden"), rubric, and resulting score with associated confidence intervals and statistical validation requirements.
 
-This standard specifies a framework for evaluating LLM-powered applications and systems, anchored in single model-task evaluations as the atomic unit. Each evaluation unit consists of an input, expected output (“Golden”), rubric, and resulting score. These atomic units may be composed into higher-level constructs to support product-level and system-level evaluations.
+The standard defines:
 
-It defines JSON-based schemas for:
+- **Evaluation Datasets:** Collections of atomic evaluations serving as ground truth benchmarks with quality assurance protocols
+- **Evaluation Rubrics:** Metrics and criteria for assessing model outputs with statistical validation requirements
+- **Evaluation Specifications:** Configurations combining datasets and rubrics with conformance testing procedures
+- **Safety and Security Protocols:** Requirements for bias detection, adversarial testing, and ethical evaluation
+- **Quality Assurance Framework:** Statistical validation, version control, and provenance tracking
+- **Conformance Testing:** Certification procedures and interoperability validation
 
-* **Evaluation Datasets:** Collections of atomic evaluations serving as ground truth benchmarks.  
-* **Evaluation Rubrics:** Metrics and criteria for assessing model outputs against expected outputs, including exact match, similarity scores, and model-based judging.  
-* **Evaluation Specifications:** Configurations that combine datasets and rubrics into executable evaluation workflows.
+The framework supports single-turn, multi-turn, multi-modal, and agentic AI evaluations, ensuring extensibility for emerging AI capabilities while maintaining statistical rigor and reproducibility.
 
-The standard shall ensure interoperability, shareability, and reproducibility of AI evaluations across tools and organizations. It is designed to be extensible to multi-turn or agent-based evaluations in future revisions.
+### 1.2 Purpose
 
-**1.2 Purpose**
+This standard establishes a comprehensive, statistically sound framework for AI model evaluation that addresses critical gaps in existing evaluation methodologies. It provides:
 
-The purpose of this standard is to establish a common, interoperable format for AI model evaluation, replacing fragmented, ad-hoc methods with a structured, machine-readable schema. It enables AI developers, product managers, and researchers to define, share, and execute evaluation workflows, ensuring consistent and comparable assessments of model performance. The standard supports continuous evaluation, cross-team benchmarking, and integration with existing AI development tools.
+- **Technical Rigor:** Statistical validation requirements, confidence intervals, and mathematical formulations comparable to established IEEE AI standards
+- **Safety and Security:** Mandatory bias detection, adversarial testing, and ethical evaluation protocols
+- **Interoperability:** Machine-readable schemas enabling cross-tool compatibility and reproducible research
+- **Quality Assurance:** Data provenance tracking, version control, and validation procedures
+- **Conformance:** Clear certification requirements and testing protocols
 
-**1.3 Word Usage**
+The standard enables AI developers, researchers, and organizations to conduct scientifically valid evaluations while ensuring safety, fairness, and reliability of AI systems.
 
-The word **shall** indicates mandatory requirements strictly to be followed in order to conform to the standard and from which no deviation is permitted (shall equals is required to).
+### 1.3 Word Usage
 
-The word **should** indicates that among several possibilities, one is recommended as particularly suitable, without mentioning or excluding others; or that a certain course of action is preferred but not necessarily required (should equals is recommended that).
+The word **shall** indicates mandatory requirements strictly to be followed in order to conform to the standard and from which no deviation is permitted.
 
-The word **may** is used to indicate a course of action permissible within the limits of the standard (may equals is permitted to).
+The word **should** indicates recommendations that are particularly suitable without excluding alternatives.
 
-The word **can** is used for statements of possibility and capability, whether material, physical, or causal (can equals is able to).
+The word **may** indicates permissible courses of action within the standard's limits.
 
-**2\. Normative References**
+The word **can** indicates statements of possibility and capability.
 
-The following referenced documents are indispensable for the application of this document (i.e., they must be understood and used, so each referenced document is cited in text and its relationship to this document is explained). For dated references, only the edition cited applies. For undated references, the latest edition of the referenced document (including any amendments or corrigenda) applies.
+## 2. Normative References
 
-* **JSON Schema Core**, Internet Engineering Task Force (IETF) Draft, draft-bhutton-json-schema-01, June 2022\.  
-* **RFC 2119**, Key words for use in RFCs to Indicate Requirement Levels, S. Bradner, March 1997\.
+The following referenced documents are indispensable for the application of this document:
 
-**3\. Definitions, Acronyms, and Abbreviations**
+- **IEEE 2802-2022,** *IEEE Standard for Performance and Safety Evaluation of Artificial Intelligence Based Medical Devices: Terminology*
+- **IEEE 2894-2024,** *IEEE Guide for an Architectural Framework for Explainable Artificial Intelligence*
+- **ISO/IEC 23053:2022,** *Information Technology — Artificial Intelligence — Framework for AI systems using machine learning*
+- **ISO/IEC 23894:2023,** *Information Technology — Artificial Intelligence — Guidance on risk management*
+- **ISO/IEC 42001:2023,** *Information Technology — Artificial Intelligence — Management system*
+- **JSON Schema Core,** *Internet Engineering Task Force (IETF) Draft, draft-bhutton-json-schema-01, June 2022*
+- **RFC 2119,** *Key words for use in RFCs to Indicate Requirement Levels, S. Bradner, March 1997*
+- **RFC 8259,** *The JavaScript Object Notation (JSON) Data Interchange Format, T. Bray, December 2017*
 
-**3.1 Definitions**
+## 3. Definitions, Acronyms, and Abbreviations
 
-For the purposes of this document, the following terms and definitions apply. The IEEE Standards Dictionary Online should be consulted for terms not defined in this clause.
+### 3.1 Definitions
 
-**Evaluation Dataset**: A collection of input-output pairs that serve as ground truth benchmarks for evaluating AI model performance. Synonym: Golden Dataset.
+**Adversarial Testing:** Systematic evaluation of AI systems using inputs designed to reveal vulnerabilities, biases, or failure modes.
 
-**Evaluation Rubric**: A set of criteria or metrics used to assess AI model outputs against expected outputs, such as exact match, similarity scores, or model-based judging.
+**Agentic AI System:** AI system capable of autonomous decision-making, planning, and multi-step task execution with environmental interaction.
 
-**Evaluation Specification**: A configuration that defines an AI evaluation workflow by combining one or more evaluation datasets and rubrics, including execution parameters.
+**Atomic Evaluation Unit:** Single model-task evaluation consisting of an input, expected output (Golden), rubric, and resulting score with confidence metrics. Foundation unit for all evaluation constructs.
 
-**Ground Truth**: The correct or ideal output for a given input, used as a reference for evaluating AI model responses.
+**Confidence Interval:** Statistical range providing bounds on population parameters with specified probability level, typically 95%.
 
-**Evaluation Unit (Atomic Evaluation):** A single model-task evaluation consisting of an input, an expected output (Golden), a rubric, and a resulting score. All other evaluation constructs in this standard (datasets, rubrics, evaluation specifications) are structured compositions of evaluation units.
+**Evaluation Dataset:** Collection of atomic evaluation units serving as ground truth benchmarks with metadata, quality metrics, and provenance information.
 
-**3.2 Acronyms and Abbreviations**
+**Evaluation Rubric:** Set of criteria, metrics, and statistical validation requirements for assessing AI outputs against expected results.
 
-AI: Artificial Intelligence  
-JSON: JavaScript Object Notation  
-LLM: Large Language Model
+**Evaluation Specification:** Configuration defining complete evaluation workflows by combining datasets, rubrics, and execution parameters with conformance requirements.
 
-**4\. Evaluation Framework Components**
+**Ground Truth:** Verified correct or ideal output for given input, serving as reference standard for evaluation with documented validation process.
 
-**4.1 General**
+**Multi-Modal Evaluation:** Assessment involving multiple input/output modalities (text, image, audio, video) within single evaluation framework.
 
-This standard defines three core components for AI model evaluation: Evaluation Datasets, Evaluation Rubrics, and Evaluation Specifications. Each component shall be represented in a JSON-based schema that is human-readable, machine-processable, and interoperable across evaluation tools.
+**Statistical Validation:** Process ensuring evaluation results meet statistical significance requirements with appropriate confidence intervals and hypothesis testing.
 
-**4.2 Evaluation Datasets**
+### 3.2 Acronyms and Abbreviations
 
-Evaluation Datasets shall consist of a collection of examples, each containing an input (e.g., a prompt or question) and one or more expected outputs (ground truth). Datasets shall include metadata such as a unique identifier, name, description, and version.  
-Each example in a dataset shall include:
+**AI:** Artificial Intelligence  
+**API:** Application Programming Interface  
+**CI:** Confidence Interval  
+**JSON:** JavaScript Object Notation  
+**LLM:** Large Language Model  
+**MANOVA:** Multivariate Analysis of Variance  
+**MSE:** Mean Squared Error  
+**ROC:** Receiver Operating Characteristic
 
-* **Input**: A string or structured JSON object representing the input to the AI model.  
-* **Expected Output**: A string or list of strings defining acceptable outputs, or a target\_scores object for multiple-choice evaluations.  
-* **Metadata** (optional): Additional information, such as difficulty level or category tags.
+## 4. Evaluation Framework Components
 
-Datasets shall support single-turn question-and-answer tasks and may be extended to multi-turn tasks in future revisions.
+### 4.1 General
 
-**4.3 Evaluation Rubrics**
+This standard defines four core components with enhanced technical requirements: Evaluation Datasets, Evaluation Rubrics, Evaluation Specifications, and Quality Assurance Protocols. Each component shall be represented in validated JSON schemas that are human-readable, machine-processable, statistically sound, and interoperable across evaluation tools.
 
-Evaluation Rubrics shall define the criteria or metrics for assessing AI model outputs. Rubrics shall specify:
+### 4.2 Evaluation Datasets
 
-* A unique identifier, name, and description.  
-* A metric type (e.g., "exact\_match", "regex\_match", "embedding\_similarity", "llm\_judge").  
-* Parameters for the metric, if applicable (e.g., case sensitivity, regex pattern).  
-* Score type (e.g., binary, numeric, categorical).
+Evaluation Datasets shall consist of collections of atomic evaluation units with comprehensive metadata and quality assurance protocols.
 
-Rubrics may include a prompt template for model-based judging (e.g., using an LLM to evaluate outputs). Multiple rubrics may be applied to a single dataset to assess different dimensions, such as accuracy and bias.
+#### 4.2.1 Dataset Requirements
 
-**4.4 Evaluation Specifications**
+Each dataset shall include:
 
-Evaluation Specifications shall define a complete evaluation workflow by combining one or more datasets and rubrics. Each specification shall include:
+- **Unique Identifier:** UUID or namespace-qualified identifier
+- **Versioning:** Semantic versioning (MAJOR.MINOR.PATCH) with migration procedures
+- **Quality Metrics:** Inter-annotator agreement scores, confidence intervals for ground truth
+- **Provenance:** Data source documentation, collection methodology, validation procedures
+- **Statistical Properties:** Sample size justification, power analysis, distribution characteristics
 
-* A unique identifier, name, and description.  
-* References to dataset(s) and rubric(s) by ID or embedded objects.  
-* Optional configuration parameters, such as maximum samples or model-specific settings.  
-* Expected metrics to be reported (e.g., Accuracy, Bias Score).
+#### 4.2.2 Atomic Unit Specifications
 
-Evaluation Specifications shall not include model outputs but shall serve as templates for executing evaluations.  
-**4.5 Evaluation Aggregation**
+Each atomic evaluation unit shall contain:
 
-Evaluation Specifications shall define how individual evaluation unit results are aggregated across the included datasets and rubrics. At minimum, rubric-level scores (e.g., accuracy, bias) shall be reported. Implementers may optionally define composite or application-level scores by applying weights or multi-dimensional indices across rubrics. Such aggregation methods shall be documented within the Evaluation Specification to ensure reproducibility and comparability.
+- **Input:** String, structured JSON object, or multi-modal reference with metadata
+- **Expected Output:** String, structured object, or multiple acceptable responses with confidence scores
+- **Validation Status:** Quality check results, reviewer consensus scores
+- **Metadata:** Category, difficulty level, demographic tags, bias indicators
 
-This standard does not prescribe a specific aggregation formula; Annex B provides an informative example.
+#### 4.2.3 Quality Assurance
 
-**5\. JSON Schema Specifications**
+Datasets shall undergo validation including:
 
-**5.1 General**
+- **Statistical Adequacy:** Minimum sample size calculations based on effect size and power requirements
+- **Bias Assessment:** Demographic representation analysis, fairness metrics evaluation
+- **Inter-Annotator Reliability:** Cohen's kappa ≥ 0.70 for categorical labels, intraclass correlation ≥ 0.80 for continuous measures
 
-The JSON schemas for Evaluation Datasets, Rubrics, and Specifications shall conform to the JSON Schema Core specification. Each schema shall include a "schema\_version" field set to "1.0" for this standard.
+### 4.3 Evaluation Rubrics
 
-**5.2 Dataset Schema**
+Evaluation Rubrics shall define statistically validated criteria for assessing AI outputs with confidence intervals and significance testing.
 
-The Dataset schema shall include the following fields:
+#### 4.3.1 Rubric Requirements
 
-* **schema\_version** (string, required): Version of the standard (e.g., "1.0").  
-* **type** (string, required): Set to "dataset".  
-* **id** (string, required): Unique identifier (e.g., "math-arith-v1").  
-* **name** (string, required): Human-readable name.  
-* **description** (string, optional): Purpose of the dataset.  
-* **version** (string, optional): Dataset content version.  
-* **license** (string, optional): License identifier (e.g., "CC-BY-SA-4.0").  
-* **author** (object or string, optional): Creator information.  
-* **examples** (array of objects, required): List of evaluation cases, each with:  
-  * **input** (required): Input prompt or question.  
-  * **expected\_output** (required unless using target\_scores): Ground truth answer(s).  
-  * **target\_scores** (optional): Scores for multiple-choice options.  
-  * **metadata** (object, optional): Additional example information.
+Each rubric shall specify:
 
-**Example**:  
-json  
-{  
-  "schema\_version": "1.0",  
-  "type": "dataset",  
-  "id": "math\_arith\_v1",  
-  "name": "Basic Arithmetic QA",  
-  "description": "Simple addition and subtraction questions.",  
-  "version": "1.0",  
-  "license": "CC-BY-SA-4.0",  
-  "author": { "name": "Alice Example", "contact": "alice@example.com" },  
-  "examples": \[  
-    {  
-      "input": "1 \+ 1 \= ?",  
-      "expected\_output": \["2", "two"\],  
-      "metadata": { "category": "addition", "difficulty": "easy" }  
-    },  
-    {  
-      "input": "5 \- 3 \= ?",  
-      "expected\_output": "2",  
-      "metadata": { "category": "subtraction", "difficulty": "easy" }  
-    }  
-  \]  
+- **Metric Definition:** Mathematical formulation with assumptions and constraints
+- **Statistical Validation:** Significance testing procedures, confidence interval calculations
+- **Calibration Requirements:** Methods for ensuring measurement validity and reliability
+- **Error Analysis:** Procedures for identifying and categorizing evaluation errors
+
+#### 4.3.2 Supported Metrics
+
+Standard metric types shall include:
+
+- **Exact Match:** Binary comparison with case sensitivity and normalization options
+- **Semantic Similarity:** Embedding-based metrics with confidence intervals
+- **Statistical Measures:** Precision, recall, F1-score with bootstrap confidence intervals
+- **Model-based Judging:** LLM evaluation with reliability assessment and bias detection
+
+#### 4.3.3 Statistical Requirements
+
+All rubrics shall provide:
+
+- **Confidence Intervals:** 95% confidence bounds using appropriate statistical methods
+- **Significance Testing:** Hypothesis testing procedures with Type I/II error control
+- **Effect Size Metrics:** Cohen's d, eta-squared, or appropriate measures
+- **Reliability Metrics:** Test-retest reliability, internal consistency measures
+
+### 4.4 Evaluation Specifications
+
+Evaluation Specifications shall define complete, reproducible evaluation workflows with statistical validation and conformance requirements.
+
+#### 4.4.1 Specification Components
+
+Each specification shall include:
+
+- **Dataset References:** Validated dataset identifiers or embedded objects
+- **Rubric Configurations:** Statistical parameters and validation requirements
+- **Execution Parameters:** Model settings, sampling procedures, randomization controls
+- **Reporting Requirements:** Mandatory metrics, confidence intervals, effect sizes
+
+#### 4.4.2 Reproducibility Requirements
+
+Specifications shall ensure reproducibility through:
+
+- **Randomization Control:** Fixed seeds, stratified sampling procedures
+- **Environmental Specification:** Software versions, hardware requirements, configuration parameters
+- **Data Partitioning:** Training/validation/test split procedures with cross-validation protocols
+
+### 4.5 Evaluation Aggregation
+
+#### 4.5.1 Statistical Aggregation
+
+Evaluation results shall be aggregated using statistically sound methods:
+
+- **Score Combination:** Weighted averages with confidence interval propagation
+- **Multi-Rubric Integration:** MANOVA or appropriate multivariate methods
+- **Uncertainty Quantification:** Bootstrap confidence intervals, Bayesian credible intervals
+
+#### 4.5.2 Reporting Requirements
+
+Aggregated results shall include:
+
+- **Point Estimates:** Mean scores with appropriate central tendency measures
+- **Confidence Intervals:** 95% bounds using validated statistical methods
+- **Effect Sizes:** Practical significance measures beyond statistical significance
+- **Uncertainty Metrics:** Standard errors, confidence interval widths
+
+## 5. Quality Assurance Requirements
+
+### 5.1 General
+
+This standard establishes comprehensive quality assurance protocols ensuring evaluation reliability, validity, and statistical soundness comparable to established scientific standards.
+
+### 5.2 Dataset Quality Requirements
+
+#### 5.2.1 Data Quality Metrics
+
+Datasets shall meet quality thresholds:
+
+- **Completeness:** <5% missing values with imputation procedures documented
+- **Consistency:** Inter-rater agreement κ ≥ 0.70 for categorical, ICC ≥ 0.80 for continuous
+- **Accuracy:** Ground truth validation with multiple independent sources
+- **Representativeness:** Population coverage analysis with bias assessment
+
+#### 5.2.2 Quality Control Procedures
+
+Implementation shall include:
+
+- **Automated Validation:** Schema compliance, statistical outlier detection
+- **Human Review:** Expert validation of samples with quality scoring
+- **Continuous Monitoring:** Quality drift detection, periodic re-validation
+
+### 5.3 Statistical Validation Requirements
+
+#### 5.3.1 Sample Size Requirements
+
+Evaluations shall meet statistical power requirements:
+
+- **Power Analysis:** Minimum 80% power for detecting meaningful effect sizes
+- **Effect Size Specifications:** Cohen's conventions or domain-specific standards
+- **Multiple Comparison Corrections:** Bonferroni, FDR, or appropriate methods
+
+#### 5.3.2 Statistical Testing
+
+Implementations shall provide:
+
+- **Hypothesis Testing:** Appropriate tests with assumption validation
+- **Confidence Intervals:** Bootstrap, parametric, or non-parametric as appropriate
+- **Significance Reporting:** p-values with effect sizes and practical significance
+
+### 5.4 Version Control and Provenance
+
+#### 5.4.1 Version Management
+
+All evaluation assets shall maintain:
+
+- **Semantic Versioning:** MAJOR.MINOR.PATCH with backward compatibility
+- **Change Documentation:** Comprehensive logs of modifications with rationale
+- **Migration Procedures:** Automated or documented upgrade paths
+
+#### 5.4.2 Provenance Tracking
+
+Implementation shall document:
+
+- **Data Lineage:** Source documentation, transformation procedures
+- **Evaluation History:** Complete audit trail of evaluations performed
+- **Dependency Management:** Version tracking of all evaluation components
+
+## 6. Safety, Security, and Bias Considerations
+
+### 6.1 General
+
+This standard mandates comprehensive safety, security, and fairness evaluation protocols addressing critical concerns in AI system deployment, following established frameworks from IEEE 2802-2022 and IEEE 2894-2024.
+
+### 6.2 Safety Evaluation Requirements
+
+#### 6.2.1 Safety Assessment Framework
+
+Implementations shall conduct safety evaluations including:
+
+- **Risk Identification:** Systematic hazard analysis using established taxonomies
+- **Failure Mode Analysis:** FMEA or equivalent methodologies for identifying potential failures
+- **Safety Metrics:** Quantitative measures of safety performance with confidence intervals
+- **Harm Assessment:** Potential impact analysis with severity classifications
+
+#### 6.2.2 Safety Testing Protocols
+
+Safety validation shall include:
+
+- **Boundary Testing:** Evaluation at operational limits and edge cases
+- **Stress Testing:** Performance under extreme conditions or resource constraints
+- **Degradation Analysis:** Graceful failure behavior assessment
+- **Recovery Testing:** System restoration capabilities after failure
+
+### 6.3 Security Assessment Protocols
+
+#### 6.3.1 Security Requirements
+
+Evaluation frameworks shall assess:
+
+- **Input Validation:** Robustness against malformed or malicious inputs
+- **Data Privacy:** PII detection and protection during evaluation
+- **Model Extraction:** Resistance to model stealing attacks
+- **Prompt Injection:** Resilience against adversarial prompt manipulation
+
+#### 6.3.2 Security Testing Methodology
+
+Security assessment shall employ:
+
+- **Penetration Testing:** Systematic vulnerability assessment with standard tools
+- **Red Team Exercises:** Adversarial evaluation by security experts
+- **Threat Modeling:** Structured analysis of potential attack vectors
+- **Compliance Verification:** Adherence to relevant security standards
+
+### 6.4 Bias Detection and Mitigation
+
+#### 6.4.1 Bias Assessment Requirements
+
+Implementations shall evaluate multiple bias dimensions:
+
+- **Demographic Parity:** Equal outcomes across protected groups with statistical testing
+- **Equalized Odds:** Equal true positive/false positive rates across groups
+- **Individual Fairness:** Similar outcomes for similar individuals with distance metrics
+- **Intersectional Analysis:** Multi-dimensional bias assessment across group combinations
+
+#### 6.4.2 Bias Testing Protocols
+
+Bias evaluation shall include:
+
+- **Fairness Metrics:** Quantitative measures with confidence intervals and significance tests
+- **Subgroup Analysis:** Performance evaluation across demographic dimensions
+- **Counterfactual Testing:** Analysis of decision changes under demographic modifications
+- **Bias Auditing:** Systematic review using established bias detection frameworks
+
+### 6.5 Adversarial Testing Requirements
+
+#### 6.5.1 Adversarial Evaluation Framework
+
+Systems shall undergo adversarial testing including:
+
+- **Adversarial Examples:** Evaluation against crafted inputs designed to cause failures
+- **Robustness Testing:** Performance assessment under various perturbation types
+- **Attack Simulation:** Evaluation against known attack methodologies
+- **Defense Validation:** Effectiveness of implemented countermeasures
+
+#### 6.5.2 Adversarial Testing Protocols
+
+Testing procedures shall employ:
+
+- **Automated Attack Generation:** Systematic creation of adversarial examples
+- **Human Red Teaming:** Expert-led adversarial evaluation
+- **Robustness Metrics:** Quantitative measures of system resilience
+- **Vulnerability Assessment:** Classification and prioritization of discovered weaknesses
+
+## 7. JSON Schema Specifications
+
+### 7.1 General
+
+JSON schemas shall conform to JSON Schema Core specification with comprehensive validation rules, versioning support, and extension mechanisms for future capabilities.
+
+### 7.2 Dataset Schema
+
+```json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ieee.org/schemas/ai-evaluation/dataset/1.0",
+  "title": "AI Evaluation Dataset Schema",
+  "type": "object",
+  "required": ["schema_version", "type", "id", "name", "examples", "quality_metrics"],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0",
+      "description": "Schema version for compatibility tracking"
+    },
+    "type": {
+      "type": "string",
+      "const": "dataset"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_-]+$",
+      "description": "Unique identifier following naming conventions"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 2000
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+      "description": "Semantic versioning"
+    },
+    "license": {
+      "type": "string",
+      "description": "SPDX license identifier"
+    },
+    "author": {
+      "oneOf": [
+        {"type": "string"},
+        {
+          "type": "object",
+          "properties": {
+            "name": {"type": "string"},
+            "contact": {"type": "string", "format": "email"},
+            "organization": {"type": "string"}
+          },
+          "required": ["name"]
+        }
+      ]
+    },
+    "quality_metrics": {
+      "type": "object",
+      "required": ["sample_size", "inter_annotator_agreement"],
+      "properties": {
+        "sample_size": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "inter_annotator_agreement": {
+          "type": "object",
+          "properties": {
+            "kappa": {"type": "number", "minimum": -1, "maximum": 1},
+            "icc": {"type": "number", "minimum": 0, "maximum": 1},
+            "confidence_interval": {
+              "type": "object",
+              "properties": {
+                "lower": {"type": "number"},
+                "upper": {"type": "number"},
+                "confidence_level": {"type": "number", "minimum": 0, "maximum": 1}
+              }
+            }
+          }
+        },
+        "bias_assessment": {
+          "type": "object",
+          "properties": {
+            "demographic_coverage": {"type": "object"},
+            "fairness_metrics": {"type": "array"},
+            "bias_score": {"type": "number", "minimum": 0, "maximum": 1}
+          }
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "properties": {
+        "data_sources": {"type": "array", "items": {"type": "string"}},
+        "collection_date": {"type": "string", "format": "date"},
+        "validation_procedures": {"type": "array", "items": {"type": "string"}},
+        "quality_controls": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "examples": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["input"],
+        "properties": {
+          "input": {
+            "description": "Input data for evaluation"
+          },
+          "expected_output": {
+            "description": "Expected output or acceptable responses"
+          },
+          "target_scores": {
+            "type": "object",
+            "description": "Scoring targets for multiple choice scenarios"
+          },
+          "confidence_score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Confidence in ground truth accuracy"
+          },
+          "metadata": {
+            "type": "object",
+            "properties": {
+              "category": {"type": "string"},
+              "difficulty": {"type": "string", "enum": ["easy", "medium", "hard"]},
+              "bias_indicators": {"type": "array", "items": {"type": "string"}},
+              "validation_status": {"type": "string", "enum": ["validated", "pending", "rejected"]}
+            }
+          }
+        }
+      }
+    }
+  }
 }
+```
 
-**5.3 Rubric Schema**
+### 7.3 Rubric Schema
 
-The Rubric schema shall include:
-
-* **schema\_version**, **type**, **id**, **name**, **description**, **version**, **license**: As defined in 5.2.  
-* **metric** (string, required): Metric type (e.g., "exact\_match", "llm\_judge").  
-* **params** (object, optional): Metric-specific parameters.  
-* **score\_type** (string, optional): Score format (e.g., "binary").  
-* **prompt\_template** (string, optional): Template for LLM-based judging.
-
-**Example**:  
-json  
-{  
-  "schema\_version": "1.0",  
-  "type": "rubric",  
-  "id": "exact\_match",  
-  "name": "Exact Match",  
-  "description": "Checks if the model output exactly matches the expected output string (case-insensitive, trimming whitespace).",  
-  "metric": "exact\_match",  
-  "params": { "case\_sensitive": false, "trim\_whitespace": true },  
-  "score\_type": "binary"  
+```json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ieee.org/schemas/ai-evaluation/rubric/1.0",
+  "title": "AI Evaluation Rubric Schema",
+  "type": "object",
+  "required": ["schema_version", "type", "id", "name", "metric", "statistical_requirements"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0"},
+    "type": {"type": "string", "const": "rubric"},
+    "id": {"type": "string", "pattern": "^[a-zA-Z0-9_-]+$"},
+    "name": {"type": "string", "minLength": 1, "maxLength": 255},
+    "description": {"type": "string", "maxLength": 2000},
+    "version": {
+      "type": "string",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$"
+    },
+    "metric": {
+      "type": "string",
+      "enum": [
+        "exact_match", "regex_match", "embedding_similarity", 
+        "llm_judge", "statistical_test", "custom"
+      ]
+    },
+    "statistical_requirements": {
+      "type": "object",
+      "required": ["confidence_level", "minimum_sample_size"],
+      "properties": {
+        "confidence_level": {
+          "type": "number",
+          "minimum": 0.8,
+          "maximum": 0.99,
+          "default": 0.95
+        },
+        "minimum_sample_size": {
+          "type": "integer",
+          "minimum": 30
+        },
+        "effect_size_threshold": {
+          "type": "number",
+          "minimum": 0.1,
+          "description": "Minimum meaningful effect size"
+        },
+        "power_requirement": {
+          "type": "number",
+          "minimum": 0.8,
+          "maximum": 1.0,
+          "default": 0.8
+        }
+      }
+    },
+    "params": {
+      "type": "object",
+      "description": "Metric-specific parameters with validation"
+    },
+    "score_type": {
+      "type": "string",
+      "enum": ["binary", "continuous", "categorical", "ordinal"]
+    },
+    "calibration": {
+      "type": "object",
+      "properties": {
+        "method": {"type": "string", "enum": ["platt_scaling", "isotonic_regression", "temperature_scaling"]},
+        "parameters": {"type": "object"},
+        "validation_score": {"type": "number", "minimum": 0, "maximum": 1}
+      }
+    },
+    "bias_assessment": {
+      "type": "object",
+      "properties": {
+        "fairness_constraints": {"type": "array", "items": {"type": "string"}},
+        "subgroup_analysis": {"type": "boolean", "default": true},
+        "bias_metrics": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "prompt_template": {
+      "type": "string",
+      "description": "Template for LLM-based evaluation"
+    }
+  }
 }
+```
 
-**5.4 Evaluation Specification Schema**
+### 7.4 Evaluation Specification Schema
 
-The Evaluation Specification schema shall include:
-
-* **schema\_version**, **type**, **id**, **name**, **description**, **version**: As defined in 5.2.  
-* **dataset\_id** (string) or **dataset** (object): Reference to or embedded dataset.  
-* **rubric\_ids** (array of strings) or **rubrics** (array of objects): References to or embedded rubrics.  
-* **metrics** (array of strings, optional): Reported metrics.  
-* **primary\_metric** (string, optional): Primary metric for focus.  
-* **config** (object, optional): Execution parameters.
-
-**Example**:  
-json  
-{  
-  "schema\_version": "1.0",  
-  "type": "evaluation",  
-  "id": "eval\_basic\_math\_v1",  
-  "name": "Basic Math Skills Evaluation",  
-  "description": "Evaluates basic addition and subtraction using an exact match rubric.",  
-  "dataset\_id": "math\_arith\_v1",  
-  "rubric\_ids": \["exact\_match"\],  
-  "metrics": \["Accuracy"\],  
-  "primary\_metric": "Accuracy",  
-  "config": { "max\_samples": 3, "model\_parameters": { "temperature": 0.0 } }  
+```json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ieee.org/schemas/ai-evaluation/specification/1.0",
+  "title": "AI Evaluation Specification Schema",
+  "type": "object",
+  "required": ["schema_version", "type", "id", "name", "datasets", "rubrics", "statistical_plan"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0"},
+    "type": {"type": "string", "const": "evaluation"},
+    "id": {"type": "string", "pattern": "^[a-zA-Z0-9_-]+$"},
+    "name": {"type": "string", "minLength": 1, "maxLength": 255},
+    "description": {"type": "string", "maxLength": 2000},
+    "version": {
+      "type": "string",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$"
+    },
+    "datasets": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "oneOf": [
+          {"type": "string", "description": "Dataset ID reference"},
+          {"$ref": "#/$defs/embedded_dataset"}
+        ]
+      }
+    },
+    "rubrics": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "oneOf": [
+          {"type": "string", "description": "Rubric ID reference"},
+          {"$ref": "#/$defs/embedded_rubric"}
+        ]
+      }
+    },
+    "statistical_plan": {
+      "type": "object",
+      "required": ["primary_metric", "significance_level"],
+      "properties": {
+        "primary_metric": {"type": "string"},
+        "significance_level": {"type": "number", "minimum": 0.01, "maximum": 0.1, "default": 0.05},
+        "multiple_comparison_correction": {
+          "type": "string",
+          "enum": ["bonferroni", "fdr_bh", "fdr_by", "none"],
+          "default": "fdr_bh"
+        },
+        "confidence_interval_method": {
+          "type": "string",
+          "enum": ["bootstrap", "parametric", "nonparametric"],
+          "default": "bootstrap"
+        },
+        "bootstrap_samples": {
+          "type": "integer",
+          "minimum": 1000,
+          "default": 10000
+        }
+      }
+    },
+    "safety_requirements": {
+      "type": "object",
+      "properties": {
+        "safety_testing": {"type": "boolean", "default": true},
+        "adversarial_testing": {"type": "boolean", "default": true},
+        "bias_testing": {"type": "boolean", "default": true},
+        "security_assessment": {"type": "boolean", "default": false}
+      }
+    },
+    "conformance_requirements": {
+      "type": "object",
+      "properties": {
+        "interoperability_testing": {"type": "boolean", "default": false},
+        "certification_level": {
+          "type": "string",
+          "enum": ["basic", "enhanced", "comprehensive"],
+          "default": "basic"
+        }
+      }
+    },
+    "config": {
+      "type": "object",
+      "properties": {
+        "max_samples": {"type": "integer", "minimum": 1},
+        "randomization_seed": {"type": "integer"},
+        "cross_validation": {
+          "type": "object",
+          "properties": {
+            "method": {"type": "string", "enum": ["k_fold", "stratified", "leave_one_out"]},
+            "folds": {"type": "integer", "minimum": 2, "maximum": 20, "default": 5}
+          }
+        },
+        "model_parameters": {"type": "object"}
+      }
+    }
+  }
 }
+```
 
-**6\. Use Cases and Integration**
+### 7.5 Schema Versioning and Migration
 
-**6.1 General**
+#### 7.5.1 Version Compatibility
 
-This standard shall support use cases such as reusable benchmarks, AI product validation, cross-team sharing, and tool integration. Implementations should ensure compatibility with existing AI evaluation frameworks.
+Schema versions shall maintain backward compatibility within major versions using semantic versioning principles:
 
-**6.2 Reusable Benchmarks**
+- **Major Version:** Breaking changes requiring migration
+- **Minor Version:** Backward-compatible feature additions
+- **Patch Version:** Backward-compatible bug fixes
 
-Evaluation Datasets, Rubrics, and Specifications shall be reusable across model versions to enable consistent performance comparisons.
+#### 7.5.2 Migration Procedures
 
-**6.3 AI Product Validation**
+Schema updates shall provide:
 
-The standard shall enable semi-technical stakeholders (e.g., product managers) to define evaluation criteria in human-readable JSON, facilitating alignment between product goals and technical metrics.
+- **Automated Migration Tools:** Programmatic conversion between schema versions
+- **Validation Procedures:** Verification of successful migration
+- **Rollback Mechanisms:** Ability to revert to previous schema versions
 
-**6.4 Cross-Team Sharing**
+## 8. Conformance and Testing
 
-The JSON-based schemas shall enable sharing of evaluation assets across teams and organizations, supporting standardized benchmarking.
+### 8.1 General
 
-**6.5 Tool Integration**
+This standard establishes comprehensive conformance requirements and testing procedures ensuring interoperability, reliability, and compliance with all specified requirements.
 
-Implementations may integrate with tools such as OpenAI Evals, LangChain/LangSmith, or custom MLOps pipelines by mapping JSON schemas to tool-specific formats.
+### 8.2 Conformance Requirements
 
-**Annex A** 
+#### 8.2.1 Mandatory Requirements
 
-**(informative)**
+Conforming implementations shall support:
 
-**Bibliography**
+- **Core Atomic Unit:** Full implementation of evaluation unit structure with input, expected output, rubric, and score
+- **JSON Schema Compliance:** Validation against all specified schemas with error reporting
+- **Statistical Requirements:** Confidence interval calculation, significance testing, and effect size reporting
+- **Quality Assurance:** Dataset validation, inter-annotator agreement measurement, and bias assessment
+- **Safety Protocols:** Basic bias detection and safety evaluation capabilities
 
-\[B1\] OpenAI Evals Framework, GitHub, [https://github.com/openai/evals](https://github.com/openai/evals).  
-\[B2\] BIG-bench JSON Task Schema, GitHub, [https://github.com/google/BIG-bench](https://github.com/google/BIG-bench).  
-\[B3\] Anthropic Model Context Protocol, [https://www.anthropic.com/news/model-context-protocol](https://www.anthropic.com/news/model-context-protocol).  
-\[B4\] AI Evaluation Best Practices, Medium, [https://medium.com/data-science-at-microsoft/evaluating-llm-systems-metrics-challenges-and-best-practices-664ac25be7e5](https://medium.com/data-science-at-microsoft/evaluating-llm-systems-metrics-challenges-and-best-practices-664ac25be7e5).  
-\[B5\] Confident AI’s Evaluation Guide, [https://www.confident-ai.com/blog/llm-evaluation-metrics-everything-you-need-for-llm-evaluation](https://www.confident-ai.com/blog/llm-evaluation-metrics-everything-you-need-for-llm-evaluation).
+#### 8.2.2 Optional Features
 
-### **Annex B (informative)**
+Implementations may optionally support:
 
-**Example of Application-Level Aggregation**
+- **Advanced Statistical Methods:** Bayesian analysis, non-parametric tests, advanced effect size measures
+- **Multi-Modal Evaluation:** Support for image, audio, video inputs and outputs
+- **Agentic AI Extensions:** Multi-step evaluation workflows and environment interaction
+- **Real-Time Evaluation:** Streaming evaluation capabilities with online statistical updates
+- **Enhanced Security:** Advanced adversarial testing and penetration testing capabilities
 
-**Note B.1 — Aggregating evaluation results at the application level**  
-While Clause 4.5 defines the requirement that rubric-level scores *shall* be reported and that composite scores *may* be defined, this annex provides an illustrative example of how an application-level score can be derived.
+#### 8.2.3 Compliance Levels
 
-Consider an AI-powered customer support application evaluated with three rubrics:
+Three compliance levels are defined:
 
-* **Accuracy** (binary exact match of expected answers).  
-* **Bias Sensitivity** (LLM-judge rubric to detect biased language).  
-* **Fluency** (embedding similarity rubric to measure naturalness of responses).
+**Basic Compliance:**
+- Core atomic unit implementation
+- JSON schema validation
+- Statistical confidence intervals (95%)
+- Basic bias detection
+- Standard evaluation metrics
 
-Each evaluation unit produces results for these rubrics. The dataset yields:
+**Enhanced Compliance:**
+- All basic compliance requirements
+- Advanced statistical validation
+- Comprehensive bias assessment
+- Safety evaluation protocols
+- Multi-modal support
 
-* Accuracy: 85%  
-* Bias Sensitivity: 92%  
-* Fluency: 78%
+**Comprehensive Compliance:**
+- All enhanced compliance requirements
+- Agentic AI evaluation support
+- Real-time evaluation capabilities
+- Advanced security assessment
+- Full interoperability testing
 
-A team may define an **application-level score** in the Evaluation Specification by applying weights that reflect business priorities, for example:
+### 8.3 Interoperability Testing
 
-* Accuracy: 50%  
-* Bias Sensitivity: 30%  
-* Fluency: 20%
+#### 8.3.1 Test Framework
 
-The composite score is then:  
-(0.85 × 0.5) \+ (0.92 × 0.3) \+ (0.78 × 0.2) \= **0.854 (85.4%)**
+Interoperability testing shall verify:
 
-This aggregated score provides a single comparative metric for decision-makers, while still preserving rubric-level detail for diagnostic purposes.
+- **Schema Compatibility:** Successful parsing and validation across implementations
+- **Data Exchange:** Correct interpretation of evaluation datasets and results
+- **Metric Compatibility:** Consistent calculation of evaluation metrics
+- **Statistical Consistency:** Agreement on confidence intervals and significance tests
 
-**Important:** The standard does not mandate a specific formula for aggregation. Implementers *shall* document chosen aggregation methods within the Evaluation Specification to ensure reproducibility and comparability.
+#### 8.3.2 Test Procedures
+
+Testing procedures shall include:
+
+- **Reference Implementation Testing:** Comparison against certified reference implementations
+- **Cross-Platform Validation:** Testing across different operating systems and architectures
+- **Performance Benchmarking:** Evaluation of computational efficiency and scalability
+- **Stress Testing:** Performance under high-volume and edge case conditions
+
+#### 8.3.3 Interoperability Metrics
+
+Successful interoperability requires:
+
+- **Schema Validation:** 100% compliance with JSON schema validation
+- **Metric Agreement:** Statistical agreement within 95% confidence intervals
+- **Performance Standards:** Response times within acceptable bounds for evaluation complexity
+- **Error Handling:** Graceful handling of malformed inputs with descriptive error messages
+
+### 8.4 Certification Procedures
+
+#### 8.4.1 Certification Process
+
+Certification involves:
+
+1. **Self-Assessment:** Implementation testing against conformance requirements
+2. **Documentation Review:** Technical documentation and compliance claims verification
+3. **Interoperability Testing:** Third-party validation of interoperability claims
+4. **Performance Evaluation:** Assessment of computational efficiency and scalability
+5. **Security Assessment:** Basic security and privacy protection verification
+
+#### 8.4.2 Certification Levels
+
+**Basic Certification:**
+- Core functionality verification
+- Schema compliance testing
+- Basic interoperability validation
+
+**Enhanced Certification:**
+- All basic certification requirements
+- Statistical validation verification
+- Safety and bias testing validation
+- Performance benchmarking
+
+**Comprehensive Certification:**
+- All enhanced certification requirements
+- Advanced feature validation
+- Security assessment
+- Long-term reliability testing
+
+#### 8.4.3 Certification Maintenance
+
+Certified implementations shall:
+
+- **Annual Review:** Yearly compliance verification and testing updates
+- **Version Compatibility:** Testing against new schema versions within 90 days
+- **Incident Reporting:** Mandatory reporting of security or safety issues
+- **Documentation Updates:** Maintenance of current compliance documentation
+
+## 9. Use Cases and Integration
+
+### 9.1 General
+
+This standard supports diverse use cases from academic research to production AI system evaluation, with particular emphasis on emerging AI capabilities and integration with existing evaluation frameworks.
+
+### 9.2 Multi-Modal Evaluations
+
+#### 9.2.1 Multi-Modal Framework
+
+Multi-modal evaluations shall support:
+
+- **Input Modalities:** Text, image, audio, video, structured data combinations
+- **Output Modalities:** Generated content across multiple modalities with cross-modal evaluation
+- **Cross-Modal Metrics:** Evaluation methods for inputs and outputs spanning different modalities
+- **Unified Scoring:** Aggregation methods for multi-modal evaluation results
+
+#### 9.2.2 Implementation Requirements
+
+Multi-modal support requires:
+
+- **Data Representation:** Standardized encoding for non-text modalities with metadata
+- **Evaluation Metrics:** Modality-specific and cross-modal similarity measures
+- **Statistical Validation:** Appropriate methods for multi-dimensional evaluation spaces
+- **Quality Assurance:** Validation procedures adapted for multi-modal content
+
+### 9.3 Agentic AI Systems
+
+#### 9.3.1 Agentic Evaluation Framework
+
+Agentic AI evaluation shall address:
+
+- **Multi-Step Evaluation:** Assessment of planning and execution across multiple actions
+- **Environment Interaction:** Evaluation of system behavior in simulated or controlled environments
+- **Goal Achievement:** Measurement of task completion and optimization metrics
+- **Behavioral Analysis:** Assessment of decision-making patterns and strategy effectiveness
+
+#### 9.3.2 Agentic Evaluation Components
+
+Extended atomic units for agentic systems include:
+
+- **Episode Definition:** Complete interaction sequences with environment state tracking
+- **Action Sequences:** Ordered sets of actions with intermediate state evaluations
+- **Outcome Metrics:** Goal achievement measures with efficiency and safety considerations
+- **Behavioral Patterns:** Analysis of decision-making strategies and adaptation capabilities
+
+### 9.4 Real-Time and Streaming Evaluation
+
+#### 9.4.1 Streaming Evaluation Framework
+
+Real-time evaluation capabilities include:
+
+- **Incremental Statistics:** Online confidence interval updates and significance testing
+- **Adaptive Sampling:** Dynamic adjustment of evaluation intensity based on performance trends
+- **Performance Monitoring:** Real-time detection of evaluation quality degradation
+- **Alert Systems:** Automated notification of significant performance changes
+
+#### 9.4.2 Implementation Considerations
+
+Streaming implementations shall provide:
+
+- **Computational Efficiency:** Optimized algorithms for real-time statistical updates
+- **Memory Management:** Bounded memory usage with appropriate data retention policies
+- **Quality Assurance:** Maintenance of statistical validity in streaming contexts
+- **Scalability:** Support for high-throughput evaluation scenarios
+
+### 9.5 Federated Evaluation Approaches
+
+#### 9.5.1 Federated Framework
+
+Federated evaluation supports:
+
+- **Distributed Datasets:** Evaluation across multiple organizations without data sharing
+- **Privacy Preservation:** Cryptographic techniques for privacy-preserving evaluation
+- **Result Aggregation:** Statistical methods for combining distributed evaluation results
+- **Trust and Verification:** Mechanisms for ensuring evaluation integrity across parties
+
+#### 9.5.2 Security and Privacy
+
+Federated implementations require:
+
+- **Secure Aggregation:** Cryptographic protocols for secure result combination
+- **Differential Privacy:** Privacy-preserving statistical methods with quantified privacy guarantees
+- **Access Control:** Authentication and authorization for federated evaluation participants
+- **Audit Trails:** Comprehensive logging for security and compliance verification
 
 ---
 
-**Notes on Refactoring and IEEE SA Style Manual Compliance**
+## Annex A (informative) Bibliography
 
-1. **Structure**: The content is reorganized into IEEE’s mandatory sections (Scope, Purpose, Word Usage, Normative References, Definitions, etc.), with technical details in clauses 4 and 5, and use cases in clause 6, per IEEE SA Style Manual guidelines.  
-2. **Word Usage**: Mandatory requirements use "shall," recommendations use "should," and permissive actions use "may," as defined in IEEE SA Standards Board Operations Manual 6.4.7.  
-3. **Normative References**: Included JSON Schema Core and RFC 2119, as they are critical for schema validation and requirement terminology.  
-4. **Licensing**: The Evalsify doc’s CC-BY-SA-4.0 and MIT licenses are noted but not included in the IEEE doc, as IEEE standards are copyrighted by IEEE. Users would need to address licensing separately for shared assets.  
-5. **Condensed Content**: Examples and use cases are streamlined to fit the IEEE format while retaining core concepts. Detailed how-to guides are omitted, as they are more suited to informative annexes or external documentation.  
-6. **Placeholders**: Participant and balloter lists are left as placeholders, as they would be populated during the IEEE standards process.
+[B1] Anthropic. *Constitutional AI: Harmlessness from AI Feedback*. arXiv:2212.08073, 2022.
 
-If you need further refinements, specific sections expanded, or additional IEEE-style content (e.g., more definitions or normative clauses), please let me know\!
+[B2] Bender, E. M., et al. *On the Dangers of Stochastic Parrots: Can Language Models Be Too Big?* ACM FAccT, 2021.
 
+[B3] Bommasani, R., et al. *On the Opportunities and Risks of Foundation Models*. Stanford Institute for Human-Centered AI, 2021.
+
+[B4] Dwork, C., & Roth, A. *The Algorithmic Foundations of Differential Privacy*. Foundations and Trends in Theoretical Computer Science, 2014.
+
+[B5] IEEE Std 2857-2021. *IEEE Standard for Privacy Engineering and Risk Assessment*. IEEE Computer Society, 2021.
+
+[B6] Liang, P., et al. *Holistic Evaluation of Language Models*. Transactions on Machine Learning Research, 2023.
+
+[B7] Mitchell, M., et al. *Model Cards for Model Reporting*. ACM Conference on Fairness, Accountability, and Transparency, 2019.
+
+[B8] OpenAI. *GPT-4 Technical Report*. arXiv:2303.08774, 2023.
+
+[B9] Raschka, S. *Model Evaluation, Model Selection, and Algorithm Selection in Machine Learning*. arXiv:1811.12808, 2018.
+
+[B10] Ribeiro, M. T., Singh, S., & Guestrin, C. *"Why Should I Trust You?" Explaining the Predictions of Any Classifier*. ACM SIGKDD, 2016.
+
+## Annex B (informative) Example Implementation
+
+### B.1 Basic Dataset Implementation
+
+```python
+import json
+from typing import Dict, List, Optional, Union
+from dataclasses import dataclass, asdict
+from datetime import datetime
+import uuid
+
+@dataclass
+class QualityMetrics:
+    sample_size: int
+    inter_annotator_agreement: Dict[str, Union[float, Dict]]
+    bias_assessment: Optional[Dict] = None
+
+@dataclass
+class EvaluationExample:
+    input: Union[str, Dict]
+    expected_output: Optional[Union[str, List[str], Dict]] = None
+    target_scores: Optional[Dict] = None
+    confidence_score: Optional[float] = None
+    metadata: Optional[Dict] = None
+
+@dataclass
+class EvaluationDataset:
+    schema_version: str = "1.0"
+    type: str = "dataset"
+    id: str = ""
+    name: str = ""
+    description: str = ""
+    version: str = "1.0.0"
+    license: Optional[str] = None
+    author: Optional[Union[str, Dict]] = None
+    quality_metrics: Optional[QualityMetrics] = None
+    provenance: Optional[Dict] = None
+    examples: List[EvaluationExample] = None
+    
+    def __post_init__(self):
+        if not self.id:
+            self.id = str(uuid.uuid4())
+        if self.examples is None:
+            self.examples = []
+    
+    def to_json(self) -> str:
+        return json.dumps(asdict(self), indent=2, default=str)
+    
+    def validate_quality_metrics(self) -> bool:
+        if not self.quality_metrics:
+            return False
+        
+        # Check sample size adequacy
+        if self.quality_metrics.sample_size < 30:
+            return False
+        
+        # Check inter-annotator agreement
+        iaa = self.quality_metrics.inter_annotator_agreement
+        if 'kappa' in iaa and iaa['kappa'] < 0.7:
+            return False
+        if 'icc' in iaa and iaa['icc'] < 0.8:
+            return False
+        
+        return True
+
+# Example usage
+dataset = EvaluationDataset(
+    name="Mathematical Reasoning Dataset",
+    description="Dataset for evaluating mathematical problem-solving capabilities",
+    quality_metrics=QualityMetrics(
+        sample_size=500,
+        inter_annotator_agreement={
+            'kappa': 0.85,
+            'confidence_interval': {
+                'lower': 0.78,
+                'upper': 0.92,
+                'confidence_level': 0.95
+            }
+        }
+    ),
+    examples=[
+        EvaluationExample(
+            input="What is the derivative of x^2 + 3x + 5?",
+            expected_output=["2x + 3", "2*x + 3"],
+            confidence_score=0.95,
+            metadata={'category': 'calculus', 'difficulty': 'easy'}
+        )
+    ]
+)
+```
+
+### B.2 Statistical Validation Implementation
+
+```python
+import numpy as np
+from scipy import stats
+from typing import Tuple, List
+import warnings
+
+class StatisticalValidator:
+    """Statistical validation for evaluation results."""
+    
+    def __init__(self, confidence_level: float = 0.95):
+        self.confidence_level = confidence_level
+        self.alpha = 1 - confidence_level
+    
+    def bootstrap_confidence_interval(self, 
+                                    data: np.ndarray, 
+                                    statistic_func: callable = np.mean,
+                                    n_bootstrap: int = 10000) -> Tuple[float, float, float]:
+        """Calculate bootstrap confidence interval."""
+        
+        if len(data) < 30:
+            warnings.warn("Sample size < 30, consider larger sample for reliable CI")
+        
+        # Bootstrap resampling
+        bootstrap_stats = []
+        for _ in range(n_bootstrap):
+            sample = np.random.choice(data, size=len(data), replace=True)
+            bootstrap_stats.append(statistic_func(sample))
+        
+        bootstrap_stats = np.array(bootstrap_stats)
+        
+        # Calculate confidence interval
+        lower_percentile = (self.alpha / 2) * 100
+        upper_percentile = (1 - self.alpha / 2) * 100
+        
+        ci_lower = np.percentile(bootstrap_stats, lower_percentile)
+        ci_upper = np.percentile(bootstrap_stats, upper_percentile)
+        point_estimate = statistic_func(data)
+        
+        return point_estimate, ci_lower, ci_upper
+    
+    def effect_size_cohens_d(self, group1: np.ndarray, group2: np.ndarray) -> float:
+        """Calculate Cohen's d effect size."""
+        pooled_std = np.sqrt(((len(group1) - 1) * np.var(group1, ddof=1) + 
+                             (len(group2) - 1) * np.var(group2, ddof=1)) / 
+                            (len(group1) + len(group2) - 2))
+        return (np.mean(group1) - np.mean(group2)) / pooled_std
+    
+    def statistical_significance_test(self, 
+                                    group1: np.ndarray, 
+                                    group2: np.ndarray,
+                                    test_type: str = 'ttest') -> Dict[str, float]:
+        """Perform statistical significance testing."""
+        
+        if test_type == 'ttest':
+            statistic, p_value = stats.ttest_ind(group1, group2)
+            effect_size = self.effect_size_cohens_d(group1, group2)
+        elif test_type == 'mann_whitney':
+            statistic, p_value = stats.mannwhitneyu(group1, group2, 
+                                                   alternative='two-sided')
+            effect_size = None  # Effect size calculation for non-parametric tests
+        else:
+            raise ValueError(f"Unknown test type: {test_type}")
+        
+        return {
+            'statistic': statistic,
+            'p_value': p_value,
+            'significant': p_value < self.alpha,
+            'effect_size': effect_size
+        }
+
+# Example usage
+validator = StatisticalValidator(confidence_level=0.95)
+
+# Sample evaluation scores
+model_scores = np.array([0.85, 0.87, 0.82, 0.88, 0.84, 0.86, 0.83, 0.89])
+baseline_scores = np.array([0.78, 0.76, 0.79, 0.77, 0.75, 0.80, 0.74, 0.78])
+
+# Bootstrap confidence interval
+mean_score, ci_lower, ci_upper = validator.bootstrap_confidence_interval(model_scores)
+print(f"Mean score: {mean_score:.3f} [{ci_lower:.3f}, {ci_upper:.3f}]")
+
+# Statistical significance test
+test_results = validator.statistical_significance_test(model_scores, baseline_scores)
+print(f"P-value: {test_results['p_value']:.4f}, Effect size: {test_results['effect_size']:.3f}")
+```
+
+## Annex C (normative) Conformance Test Procedures
+
+### C.1 Schema Validation Tests
+
+#### C.1.1 JSON Schema Compliance
+
+Conforming implementations shall pass the following validation tests:
+
+**Test C.1.1.1: Basic Schema Validation**
+- Input: Valid dataset/rubric/specification JSON
+- Expected: Successful validation without errors
+- Implementation: Use JSON Schema validator against specified schemas
+
+**Test C.1.1.2: Invalid Schema Rejection**
+- Input: JSON with missing required fields
+- Expected: Validation failure with descriptive error messages
+- Implementation: Test with systematically malformed inputs
+
+**Test C.1.1.3: Version Compatibility**
+- Input: Documents with different schema versions
+- Expected: Appropriate handling based on compatibility matrix
+- Implementation: Test migration and validation across versions
+
+#### C.1.2 Statistical Validation Tests
+
+**Test C.1.2.1: Confidence Interval Calculation**
+- Input: Sample evaluation scores
+- Expected: 95% confidence intervals within statistical tolerance
+- Implementation: Compare against reference statistical implementations
+
+**Test C.1.2.2: Significance Testing**
+- Input: Two sample groups with known statistical properties
+- Expected: Correct p-values and effect size calculations
+- Implementation: Test against established statistical test results
+
+### C.2 Interoperability Tests
+
+#### C.2.1 Data Exchange Tests
+
+**Test C.2.1.1: Cross-Platform Dataset Exchange**
+- Procedure: Export dataset from Implementation A, import to Implementation B
+- Expected: Identical evaluation results within statistical tolerance
+- Success Criteria: Difference in aggregate scores < 1%
+
+**Test C.2.1.2: Rubric Portability**
+- Procedure: Apply same rubric across different implementations
+- Expected: Consistent scoring and confidence intervals
+- Success Criteria: Statistical agreement within 95% confidence intervals
+
+#### C.2.2 Performance Tests
+
+**Test C.2.2.1: Scalability Assessment**
+- Input: Datasets of varying sizes (100, 1K, 10K, 100K examples)
+- Expected: Linear or better scaling characteristics
+- Success Criteria: Processing time increases ≤ O(n log n)
+
+**Test C.2.2.2: Memory Usage**
+- Input: Large evaluation specifications
+- Expected: Bounded memory usage with appropriate error handling
+- Success Criteria: Memory usage < 10GB for 100K example datasets
+
+## Annex D (informative) Statistical Methods for Evaluation
+
+### D.1 Confidence Interval Methods
+
+#### D.1.1 Bootstrap Methods
+
+Bootstrap confidence intervals provide distribution-free estimates suitable for complex evaluation metrics:
+
+**Percentile Bootstrap:**
+1. Resample evaluation results with replacement B times
+2. Calculate statistic of interest for each bootstrap sample
+3. Use percentiles of bootstrap distribution as confidence bounds
+
+**Bias-Corrected and Accelerated (BCa) Bootstrap:**
+- Corrects for bias and skewness in bootstrap distribution
+- Recommended for small samples or skewed distributions
+- Provides more accurate coverage probabilities
+
+#### D.1.2 Parametric Methods
+
+For normally distributed evaluation metrics:
+
+**Student's t-distribution:**
+- CI = x̄ ± t(α/2,n-1) × (s/√n)
+- Appropriate for sample sizes n ≥ 30 or normally distributed data
+- Requires assumption verification through normality tests
+
+### D.2 Effect Size Measures
+
+#### D.2.1 Cohen's d
+- d = (μ₁ - μ₂) / σ_pooled
+- Interpretation: 0.2 (small), 0.5 (medium), 0.8 (large)
+- Appropriate for comparing two groups
+
+#### D.2.2 Eta-squared (η²)
+- η² = SS_between / SS_total  
+- Proportion of variance explained by group differences
+- Useful for ANOVA contexts with multiple groups
+
+### D.3 Multiple Comparison Corrections
+
+#### D.3.1 Benjamini-Hochberg FDR Control
+Recommended for multiple evaluation comparisons:
+
+1. Order p-values: p₁ ≤ p₂ ≤ ... ≤ pₘ
+2. Find largest k where p_k ≤ (k/m) × α
+3. Reject hypotheses 1, 2, ..., k
+
+#### D.3.2 Bonferroni Correction
+Conservative approach: α_corrected = α / m
+- Use when Type I error control is critical
+- May reduce statistical power significantly
+
+## Annex E (informative) Security Considerations Checklist
+
+### E.1 Input Validation Security
+
+#### E.1.1 Data Sanitization
+- [ ] Input validation against malicious JSON payloads
+- [ ] Size limits for evaluation datasets and examples  
+- [ ] Content filtering for potentially harmful inputs
+- [ ] Encoding validation and normalization
+
+#### E.1.2 Injection Attack Prevention
+- [ ] SQL injection prevention in database operations
+- [ ] Command injection prevention in system calls
+- [ ] Template injection prevention in rubric templates
+- [ ] Script injection prevention in web interfaces
+
+### E.2 Privacy Protection
+
+#### E.2.1 Data Privacy
+- [ ] PII detection and masking in evaluation datasets
+- [ ] Encryption of sensitive evaluation data at rest
+- [ ] Secure transmission protocols (TLS 1.3+)
+- [ ] Access logging and audit trails
+
+#### E.2.2 Model Privacy
+- [ ] Prevention of model extraction through evaluation
+- [ ] Differential privacy implementation for sensitive evaluations
+- [ ] Secure aggregation for federated evaluation
+- [ ] Access control for evaluation results
+
+### E.3 System Security
+
+#### E.3.1 Authentication and Authorization
+- [ ] Multi-factor authentication for administrative access
+- [ ] Role-based access control for evaluation resources
+- [ ] API key management and rotation
+- [ ] Session management and timeout policies
+
+#### E.3.2 Infrastructure Security
+- [ ] Regular security updates and patch management
+- [ ] Network segmentation and firewall configuration
+- [ ] Intrusion detection and monitoring systems
+- [ ] Backup and disaster recovery procedures
+
+## Annex F (informative) Multi-Modal and Agentic Extensions
+
+### F.1 Multi-Modal Evaluation Extensions
+
+#### F.1.1 Extended Atomic Unit Structure
+
+```json
+{
+  "input": {
+    "modalities": {
+      "text": "Describe this image and generate an audio description",
+      "image": {"type": "reference", "url": "dataset://image_001.jpg"},
+      "metadata": {"image_type": "photograph", "resolution": "1920x1080"}
+    }
+  },
+  "expected_output": {
+    "modalities": {
+      "text": "A sunset over mountains with vibrant orange and pink colors",
+      "audio": {"type": "reference", "url": "dataset://audio_001.wav"},
+      "metadata": {"audio_duration": 15.3, "text_length": 65}
+    }
+  },
+  "cross_modal_alignment": {
+    "text_image_consistency": 0.85,
+    "text_audio_consistency": 0.92,
+    "overall_coherence": 0.88
+  }
+}
+```
+
+#### F.1.2 Multi-Modal Metrics
+
+**Cross-Modal Similarity Measures:**
+- CLIP-based text-image similarity
+- Audio-text semantic alignment using speech embeddings  
+- Video-text temporal consistency metrics
+- Multi-modal embedding distance measures
+
+### F.2 Agentic AI Evaluation Extensions
+
+#### F.2.1 Episode-Based Evaluation Structure
+
+```json
+{
+  "episode": {
+    "id": "agent_episode_001",
+    "environment": "web_navigation_task",
+    "initial_state": {"url": "https://example.com", "goal": "book_flight"},
+    "action_sequence": [
+      {
+        "step": 1,
+        "action": {"type": "click", "element": "#search-button"},
+        "observation": {"page_changed": true, "new_url": "https://example.com/search"},
+        "reasoning": "Clicked search to find flight options"
+      }
+    ],
+    "final_state": {"task_completed": true, "efficiency_score": 0.87},
+    "evaluation_metrics": {
+      "goal_achievement": 1.0,
+      "efficiency": 0.87,
+      "safety_violations": 0,
+      "reasoning_quality": 0.92
+    }
+  }
+}
+```
+
+#### F.2.2 Agentic Evaluation Metrics
+
+**Goal Achievement Measures:**
+- Binary task completion indicators
+- Partial credit scoring for multi-step tasks
+- Time-to-completion efficiency metrics
+- Resource utilization optimization scores
+
+**Behavioral Quality Measures:**
+- Decision-making consistency across similar scenarios
+- Adaptation capability when facing obstacles
+- Safety adherence in critical situations
+- Reasoning transparency and explainability
+
+---
+
+This enhanced IEEE standard addresses all major shortcomings identified in the critical analysis while maintaining the practical focus needed for industry adoption. The standard now provides comprehensive technical rigor, safety considerations, statistical validation requirements, and extensibility for emerging AI capabilities.
